@@ -48,24 +48,12 @@ jobs:
         sudo rm -rf "$AGENT_TOOLSDIRECTORY" >/dev/null 2>&1 || true
         sudo docker rmi $(docker images -qf "dangling=true") >/dev/null 2>&1 || true
         df -h
-    - name: Build toolchain
+    - name: Build Image
       working-directory: ./omr
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
-        sh build.sh prepare {tools,toolchain}/install -j$(nproc) || sh build.sh prepare {tools,toolchain}/install -j1 V=s
-    - name: Build packages
-      working-directory: ./omr
-      env:
-        OMR_TARGET: ${{ matrix.OMR_TARGET }}
-      run: |
-        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
-    - name: Build image
-      working-directory: ./omr
-      env:
-        OMR_TARGET: ${{ matrix.OMR_TARGET }}
-      run: |
-        make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j1 V=s
+        bash build.sh IGNORE_ERRORS=m -j$(nproc) || bash build.sh IGNORE_ERRORS=m -j1 V=s
     - name: Deliver firmware
       uses: actions/upload-artifact@v2
       with:
