@@ -36,7 +36,7 @@ jobs:
         sudo docker rmi $(docker images -qf "dangling=true") >/dev/null 2>&1 || true
         df -h
     - name: Prepare WorkDir
-      working-directory: ../../
+      working-directory: ./
       env: 
         REPO_URL: https://github.com/WillzenZou/Gather
         SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
@@ -48,22 +48,22 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: master
-        path: '../../omr'
+        path: './omr'
     - name: Build toolchain
-      working-directory: ../../omr
+      working-directory: ./omr
       env:
         SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
         sh build.sh prepare {tools,toolchain}/install -j$(nproc) || sh build.sh prepare {tools,toolchain}/install -j1 V=s
     - name: Build packages
-      working-directory: ../../omr
+      working-directory: ./omr
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
         make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
     - name: Build image
-      working-directory: ../../omr
+      working-directory: ./omr
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
@@ -72,10 +72,10 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.OMR_TARGET }}
-        path: /home/runner/work/omr/${{ matrix.OMR_TARGET }}/source/bin/*.gz
+        path: ./omr/${{ matrix.OMR_TARGET }}/source/bin/*.gz
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.OMR_TARGET }}
-        path: /home/runner/work/omr/${{ matrix.OMR_TARGET }}/source/bin
+        path: ./omr/${{ matrix.OMR_TARGET }}/source/bin
 
