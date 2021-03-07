@@ -49,6 +49,7 @@ jobs:
       with:
         ref: master
         path: './omr'
+        token: ${{ secrets.PRI_TOKEN }}
     - name: Build toolchain
       working-directory: ./omr
       env:
