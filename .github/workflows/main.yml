@@ -58,7 +58,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.OMR_TARGET }}
-        path: ./omr/${{ matrix.OMR_TARGET }}/source/bin/*.gz
+        path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
     - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
