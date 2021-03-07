@@ -1,0 +1,84 @@
+diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi.dtsi b/arch/arm/boot/dts/sun8i-h3-nanopi.dtsi
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi.dtsi	2021-03-03 23:45:33.497848901 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi.dtsi	2021-01-21 18:12:40.707570087 +0800
+@@ -61,13 +61,13 @@
+ 		compatible = "gpio-leds";
+ 
+ 		status {
+-			label = "nanopi:blue:status";
++			label = "gather:blue:status";
+ 			gpios = <&pio 0 10 GPIO_ACTIVE_HIGH>;
+ 			linux,default-trigger = "heartbeat";
+ 		};
+ 
+ 		pwr {
+-			label = "nanopi:green:pwr";
++			label = "gather:green:pwr";
+ 			gpios = <&r_pio 0 10 GPIO_ACTIVE_HIGH>;
+ 			default-state = "on";
+ 		};
+diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-03-03 23:45:33.497848901 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-03-03 23:49:15.664991820 +0800
+@@ -45,6 +45,61 @@
+ / {
+ 	model = "GATHER NANO V1.1";
+ 	compatible = "allwinner,sun8i-h3";
++	
++	gpio-keys-polled {
++		compatible = "gpio-keys-polled";
++		#address-cells = <1>;
++		#size-cells = <0>;
++		poll-interval = <20>;
++
++		reset {
++				label = "reset";
++				linux,code = <0x198>;
++				gpios = <&pio 0 12 GPIO_ACTIVE_LOW>;
++		};
++	};
++	
++	leds {
++		wifi-leds {
++			label = "gather:leds:wifi";
++			gpios = <&pio 0 15 GPIO_ACTIVE_HIGH>;
++		};
++		
++		aggregate-leds {
++			label = "gather:leds:aggregate";
++			gpios = <&pio 0 16 GPIO_ACTIVE_HIGH>;
++		};
++		
++		usb1-leds {
++			label = "gather:leds:usb1";
++			gpios = <&pio 6 9 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++		
++		usb2-leds {
++			label = "gather:leds:usb2";
++			gpios = <&pio 6 8 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++		
++		usb3-leds {
++			label = "gather:leds:usb3";
++			gpios = <&pio 0 6 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++		
++		usb4-leds {
++			label = "gather:leds:usb4";
++			gpios = <&pio 6 7 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++		
++		usb5-leds {
++			label = "gather:leds:usb5";
++			gpios = <&pio 6 6 GPIO_ACTIVE_HIGH>;
++			default-state = "off";
++		};
++	};
+ };
+ 
+ &mmc2 {

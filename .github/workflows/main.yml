@@ -1,0 +1,81 @@
+name: openmptcprouter
+on: [push]
+
+env:
+  REPO_URL: 'https://github.com/WillzenZou/Gather'
+  OMR_KERNEL: '5.4'
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        OMR_TARGET: [nanopi_neo]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+    - name: Branch name
+      id: branch_name
+      run: |
+        echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
+        echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
+        echo ::set-output name=WORKSPACE::${GITHUB_WORKSPACE}
+    - name: Prepare
+      run: |
+        sudo apt-get update
+        sudo apt-get install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs git-core gcc-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler
+    - name: Free disk space
+      run: |
+        df -h
+        sudo swapoff -a >/dev/null 2>&1 || true
+        sudo rm -f /swapfile >/dev/null 2>&1 || true
+        sudo apt-get autoremove -y >/dev/null 2>&1 || true
+        sudo apt-get autoclean -y >/dev/null 2>&1 || true
+        sudo rm -rf "/usr/local/share/boost" >/dev/null 2>&1 || true
+        sudo rm -rf "$AGENT_TOOLSDIRECTORY" >/dev/null 2>&1 || true
+        sudo docker rmi $(docker images -qf "dangling=true") >/dev/null 2>&1 || true
+        df -h
+    - name: Prepare WorkDir
+      working-directory: ../../
+      env: 
+        REPO_URL: https://github.com/WillzenZou/Gather
+        SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+        GITHUB_WORKSPACE: ${{ steps.branch_name.outputs.WORKSPACE }}
+      run: |
+        mkdir -p omr
+        pwd
+    - name: Checkout
+      working-directory: ../../omr
+      uses: actions/checkout@v2
+      with:
+        ref: master
+    - name: Build toolchain
+      working-directory: ../../omr
+      env:
+        SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
+        OMR_TARGET: ${{ matrix.OMR_TARGET }}
+      run: |
+        sh build.sh prepare {tools,toolchain}/install -j$(nproc) || sh build.sh prepare {tools,toolchain}/install -j1 V=s
+    - name: Build packages
+      working-directory: ../../omr
+      env:
+        OMR_TARGET: ${{ matrix.OMR_TARGET }}
+      run: |
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
+    - name: Build image
+      working-directory: ../../omr
+      env:
+        OMR_TARGET: ${{ matrix.OMR_TARGET }}
+      run: |
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j1 V=s
+    - name: Deliver firmware
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.OMR_TARGET }}
+        path: /home/runner/work/omr/${{ matrix.OMR_TARGET }}/source/bin/*.gz
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ matrix.OMR_TARGET }}
+        path: /home/runner/work/omr/${{ matrix.OMR_TARGET }}/source/bin
+

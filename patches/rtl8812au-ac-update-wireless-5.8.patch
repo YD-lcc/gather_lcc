@@ -1,0 +1,175 @@
+From af426db0e78c3880a6bfe26fa97ae03caccce783 Mon Sep 17 00:00:00 2001
+From: Jeff Collins <jeffcollins9292@gmail.com>
+Date: Fri, 24 Jul 2020 13:45:25 -0400
+Subject: [PATCH] rtl8812au-ac: update wireless 5.8
+
+Signed-off-by: Jeff Collins <jeffcollins9292@gmail.com>
+---
+ package/kernel/rtl8812au-ac/Makefile          | 64 +++++++++++++++++++
+ ...odify-Makefile-for-openwrt-toolchain.patch | 12 ++++
+ ...-value-of-vht_enable-switch_usb_mode.patch | 21 ++++++
+ .../patches/0003-wireless-5.8.patch           | 37 +++++++++++
+ 4 files changed, 134 insertions(+)
+ create mode 100644 package/kernel/rtl8812au-ac/Makefile
+ create mode 100644 package/kernel/rtl8812au-ac/patches/0001-Modify-Makefile-for-openwrt-toolchain.patch
+ create mode 100644 package/kernel/rtl8812au-ac/patches/0002-Change-default-value-of-vht_enable-switch_usb_mode.patch
+ create mode 100644 package/kernel/rtl8812au-ac/patches/0003-wireless-5.8.patch
+
+diff --git a/package/kernel/rtl8812au-ac/Makefile b/package/kernel/rtl8812au-ac/Makefile
+new file mode 100644
+index 000000000000..35191f0e1484
+--- /dev/null
++++ b/package/kernel/rtl8812au-ac/Makefile
+@@ -0,0 +1,64 @@
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=rtl8812au-ac
++PKG_RELEASE:=1
++
++PKG_LICENSE:=GPLv2
++PKG_LICENSE_FILES:=
++
++PKG_SOURCE_URL:=https://github.com/aircrack-ng/rtl8812au.git
++PKG_SOURCE_PROTO:=git
++PKG_SOURCE_DATE:=2020-06-26
++PKG_SOURCE_VERSION:=58f6be25f7c86d7ba67b0ccc638cf667755e6e1b
++PKG_MIRROR_HASH:=60359df8b49fa433d38b968b0df7eaddaca10f13cdd57471394bac1f6e5a162e
++
++# PKG_MAINTAINER:=
++PKG_BUILD_PARALLEL:=1
++
++STAMP_CONFIGURED_DEPENDS := $(STAGING_DIR)/usr/include/mac80211-backport/backport/autoconf.h
++
++include $(INCLUDE_DIR)/kernel.mk
++include $(INCLUDE_DIR)/package.mk
++
++define KernelPackage/rtl8812au-ac
++  SUBMENU:=Wireless Drivers
++  TITLE:=Realtek rtl8812au/21au and rtl8814au driver
++  DEPENDS:=+kmod-cfg80211 +kmod-usb-core +@DRIVER_11N_SUPPORT +@DRIVER_11AC_SUPPORT
++  FILES:=\
++	$(PKG_BUILD_DIR)/rtl8812au.ko
++  AUTOLOAD:=$(call AutoProbe,rtl8812au)
++endef
++
++NOSTDINC_FLAGS = \
++	-I$(PKG_BUILD_DIR) \
++	-I$(PKG_BUILD_DIR)/include \
++	-I$(STAGING_DIR)/usr/include/mac80211-backport \
++	-I$(STAGING_DIR)/usr/include/mac80211-backport/uapi \
++	-I$(STAGING_DIR)/usr/include/mac80211 \
++	-I$(STAGING_DIR)/usr/include/mac80211/uapi \
++	-include backport/autoconf.h \
++	-include backport/backport.h
++
++NOSTDINC_FLAGS += -DCONFIG_IOCTL_CFG80211 -DRTW_USE_CFG80211_STA_EVENT \
++	-D_LINUX_BYTEORDER_SWAB_H -DBUILD_OPENWRT -DRTW_SINGLE_WIPHY
++ifeq ($(CONFIG_BIG_ENDIAN), y)
++NOSTDINC_FLAGS += -DCONFIG_BIG_ENDIAN
++endif
++ifeq ($(CONFIG_LITTLE_ENDIAN), y)
++NOSTDINC_FLAGS += -DCONFIG_LITTLE_ENDIAN
++endif
++
++PKG_MAKE_FLAGS += USER_MODULE_NAME=rtl8812au
++PKG_MAKE_FLAGS += USER_DRV_NAME=rtl8812au
++KERNEL_MAKE_FLAGS += CONFIG_88XXAU=m
++
++define Build/Compile
++	+$(MAKE) $(PKG_JOBS) -C "$(LINUX_DIR)" \
++		$(KERNEL_MAKE_FLAGS) \
++		$(PKG_MAKE_FLAGS) \
++		M="$(PKG_BUILD_DIR)" \
++		NOSTDINC_FLAGS="$(NOSTDINC_FLAGS)" \
++		modules
++endef
++
++$(eval $(call KernelPackage,rtl8812au-ac))
+diff --git a/package/kernel/rtl8812au-ac/patches/0001-Modify-Makefile-for-openwrt-toolchain.patch b/package/kernel/rtl8812au-ac/patches/0001-Modify-Makefile-for-openwrt-toolchain.patch
+new file mode 100644
+index 000000000000..1a380b88e2fb
+--- /dev/null
++++ b/package/kernel/rtl8812au-ac/patches/0001-Modify-Makefile-for-openwrt-toolchain.patch
+@@ -0,0 +1,12 @@
++--- a/Makefile
+++++ b/Makefile
++@@ -91,7 +91,7 @@ CONFIG_RTW_SDIO_PM_KEEP_POWER = y
++ ###################### MP HW TX MODE FOR VHT #######################
++ CONFIG_MP_VHT_HW_TX_MODE = n
++ ###################### Platform Related #######################
++-CONFIG_PLATFORM_I386_PC = y
+++CONFIG_PLATFORM_I386_PC = n
++ CONFIG_PLATFORM_ANDROID_ARM64 = n
++ CONFIG_PLATFORM_ARM_RPI = n
++ CONFIG_PLATFORM_ARM64_RPI = n
++--
+diff --git a/package/kernel/rtl8812au-ac/patches/0002-Change-default-value-of-vht_enable-switch_usb_mode.patch b/package/kernel/rtl8812au-ac/patches/0002-Change-default-value-of-vht_enable-switch_usb_mode.patch
+new file mode 100644
+index 000000000000..aba8ce762369
+--- /dev/null
++++ b/package/kernel/rtl8812au-ac/patches/0002-Change-default-value-of-vht_enable-switch_usb_mode.patch
+@@ -0,0 +1,21 @@
++--- a/os_dep/linux/os_intfs.c
+++++ b/os_dep/linux/os_intfs.c
++@@ -254,7 +254,7 @@ int rtw_bfee_rf_number = 0; /*BeamformeeCapRfNum  Rf path number, 0 for auto, ot
++ #endif /* CONFIG_80211N_HT */
++
++ #ifdef CONFIG_80211AC_VHT
++-int rtw_vht_enable = 1; /* 0:disable, 1:enable, 2:force auto enable */
+++int rtw_vht_enable = 2; /* 0:disable, 1:enable, 2:force auto enable */
++ module_param(rtw_vht_enable, int, 0644);
++
++ int rtw_ampdu_factor = 7;
++@@ -324,7 +324,7 @@ int rtw_drv_ant_band_switch = 1; /* 0:OFF , 1:ON, Driver control antenna band sw
++ int rtw_single_ant_path; /*0:main ant , 1:aux ant , Fixed single antenna path, default main ant*/
++
++ /* 0: doesn't switch, 1: switch from usb2.0 to usb 3.0 2: switch from usb3.0 to usb 2.0 */
++-int rtw_switch_usb_mode = 0;
+++int rtw_switch_usb_mode = 1;
++
++ #ifdef CONFIG_USB_AUTOSUSPEND
++ int rtw_enusbss = 1;/* 0:disable,1:enable */
++--
+diff --git a/package/kernel/rtl8812au-ac/patches/0003-wireless-5.8.patch b/package/kernel/rtl8812au-ac/patches/0003-wireless-5.8.patch
+new file mode 100644
+index 000000000000..b26a605a3477
+--- /dev/null
++++ b/package/kernel/rtl8812au-ac/patches/0003-wireless-5.8.patch
+@@ -0,0 +1,37 @@
++--- a/os_dep/linux/ioctl_cfg80211.c
+++++ b/os_dep/linux/ioctl_cfg80211.c
++@@ -7597,6 +7597,14 @@ exit:
++	return ret;
++ }
++
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5, 8, 0)) || defined(BUILD_OPENWRT)
+++static void cfg80211_rtw_update_mgmt_frame_registrations(struct wiphy *wiphy,
+++						   struct wireless_dev *wdev,
+++						   struct mgmt_frame_regs *upd)
+++{
+++
+++}
+++#else
++ static void cfg80211_rtw_mgmt_frame_register(struct wiphy *wiphy,
++ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 6, 0))
++	struct wireless_dev *wdev,
++@@ -7651,6 +7659,7 @@ static void cfg80211_rtw_mgmt_frame_register(struct wiphy *wiphy,
++ exit:
++	return;
++ }
+++#endif
++
++ #if defined(CONFIG_TDLS) && (LINUX_VERSION_CODE >= KERNEL_VERSION(3, 2, 0))
++ static int cfg80211_rtw_tdls_mgmt(struct wiphy *wiphy,
++@@ -10067,7 +10076,10 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
++	.update_ft_ies = cfg80211_rtw_update_ft_ies,
++ #endif
++
++-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0)) || defined(BUILD_OPENWRT)
+++	.mgmt_tx = cfg80211_rtw_mgmt_tx,
+++	.update_mgmt_frame_registrations = cfg80211_rtw_update_mgmt_frame_registrations,
+++#elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,37)) || defined(COMPAT_KERNEL_RELEASE)
++	.mgmt_tx = cfg80211_rtw_mgmt_tx,
++	.mgmt_frame_register = cfg80211_rtw_mgmt_frame_register,
++ #elif (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 34) && LINUX_VERSION_CODE <= KERNEL_VERSION(2, 6, 35))
