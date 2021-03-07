@@ -45,10 +45,10 @@ jobs:
         mkdir -p omr
         pwd
     - name: Checkout
-      working-directory: ../../omr
       uses: actions/checkout@v2
       with:
         ref: master
+        path: '../../omr'
     - name: Build toolchain
       working-directory: ../../omr
       env:
