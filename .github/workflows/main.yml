@@ -24,6 +24,7 @@ jobs:
       uses: actions/checkout@v2
       with:
         ref: main
+        path: './omr'
         token: ${{ secrets.PRI_TOKEN }}
     - name: Prepare WorkDir
       working-directory: ./
@@ -32,7 +33,6 @@ jobs:
         SOURCE_NAME: ${{ steps.branch_name.outputs.SOURCE_NAME }}
         GITHUB_WORKSPACE: ${{ steps.branch_name.outputs.WORKSPACE }}
       run: |
-        mv Gather omr
         ls -al
         pwd
     - name: Prepare
