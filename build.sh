@@ -43,7 +43,7 @@ OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-coun
 OMR_REPO=${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE/$OMR_TARGET}
 
 OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/suyuan168/openmptcprouter-feeds}"
-OMR_FEED_SRC="${OMR_FEED_SRC:-dd7a0481de39d667ada71f43c8982ec4dd4cd023}"
+OMR_FEED_SRC="${OMR_FEED_SRC:-1bd9c2d824dc8f3e556686a0bacea4262a08e9de}"
 
 CUSTOM_FEED_URL="${CUSTOM_FEED_URL}"
 
