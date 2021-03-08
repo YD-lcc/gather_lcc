@@ -39,11 +39,15 @@ OMR_TARGET_CONFIG="config-$OMR_TARGET"
 OMR_KERNEL=${OMR_KERNEL:-5.4}
 #OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | sed 's/^\([0-9.]*\).*/\1/')}
 #OMR_RELEASE=${OMR_RELEASE:-$(git tag --sort=committerdate | tail -1)}
-OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | tail -1 | cut -d '-' -f1)}
-OMR_REPO=${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE/$OMR_TARGET}
+OMR_RELEASE="0.78.0-g"
+#${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | tail -1 | cut -d '-' -f1)}
+OMR_REPO="localhost"
+#${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE/$OMR_TARGET}
 
-OMR_FEED_URL="${OMR_FEED_URL:-https://github.com/suyuan168/openmptcprouter-feeds}"
-OMR_FEED_SRC="${OMR_FEED_SRC:-1bd9c2d824dc8f3e556686a0bacea4262a08e9de}"
+OMR_FEED_URL="https://github.com/WillzenZou/openmptcprouter-feeds"
+#"${OMR_FEED_URL:-https://github.com/suyuan168/openmptcprouter-feeds}"
+OMR_FEED_SRC="0.78.0g"
+#"${OMR_FEED_SRC:-1bd9c2d824dc8f3e556686a0bacea4262a08e9de}"
 
 CUSTOM_FEED_URL="${CUSTOM_FEED_URL}"
 
@@ -79,6 +83,7 @@ else
 fi
 
 #_get_repo source https://github.com/ysurac/openmptcprouter-source "master"
+echo "OpenWrt types: "${OMR_OPENWRT}
 if [ "$OMR_OPENWRT" = "default" ]; then
 	_get_repo "$OMR_TARGET/source" https://github.com/openwrt/openwrt "cbccc2560c0240c2c9528e82d745b7f45ce88bbd"
 	_get_repo feeds/packages https://github.com/openwrt/packages "9ef2e619b9bba054d6848714f77b462f1f359c2c"
