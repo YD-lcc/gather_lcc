@@ -20,19 +20,6 @@ jobs:
         echo ::set-output name=SOURCE_BRANCH::${GITHUB_REF#refs/heads/}
         echo ::set-output name=SOURCE_TAG::${GITHUB_REF#refs/tags/}
         echo ::set-output name=WORKSPACE::${GITHUB_WORKSPACE}
-    - name: Checkout
-      uses: actions/checkout@v2
-      with:
-        ref: main
-        path: './omr'
-        token: ${{ secrets.PRI_TOKEN }}
-    - name: Prepare WorkDir
-      working-directory: ./
-      env: 
-        GITHUB_WORKSPACE: ${{ steps.branch_name.outputs.WORKSPACE }}
-      run: |
-        ls -al
-        pwd
     - name: Prepare
       run: |
         sudo apt-get update
@@ -48,12 +35,35 @@ jobs:
         sudo rm -rf "$AGENT_TOOLSDIRECTORY" >/dev/null 2>&1 || true
         sudo docker rmi $(docker images -qf "dangling=true") >/dev/null 2>&1 || true
         df -h
-    - name: Build Image
+    - name: Checkout
+      uses: actions/checkout@v2
+      with:
+        ref: main
+        path: './omr'
+        token: ${{ secrets.PRI_TOKEN }}
+    - name: Build toolchain
+      env:
+        OMR_TARGET: ${{ matrix.OMR_TARGET }}
+      run: |
+        (cd ./omr && bash build.sh prepare {tools,toolchain}/install -j$(nproc)) || bash build.sh prepare {tools,toolchain}/install -j1 V=s
+    - name: Prepare WorkDir
+      run: |
+        cd ./omr
+        ls -al
+        ls -al nanopi_neo/source/package/kernel || true
+        pwd
+    - name: Build packages
       working-directory: ./omr
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
-        bash build.sh IGNORE_ERRORS=m -j$(nproc) || bash build.sh IGNORE_ERRORS=m -j1 V=s
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
+    - name: Build image
+      working-directory: ./omr
+      env:
+        OMR_TARGET: ${{ matrix.OMR_TARGET }}
+      run: |
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j1 V=s
     - name: Deliver firmware
       uses: actions/upload-artifact@v2
       with:
