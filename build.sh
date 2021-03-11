@@ -46,7 +46,7 @@ OMR_REPO="localhost"
 
 OMR_FEED_URL="https://github.com/WillzenZou/openmptcprouter-feeds"
 #"${OMR_FEED_URL:-https://github.com/suyuan168/openmptcprouter-feeds}"
-OMR_FEED_SRC="bd80052ef1708b7f80d31e94f4de9b44a85033ec"
+OMR_FEED_SRC="e44ba719dbad8e53cc6e11831310c7cd80ddabdd"
 # "0.78.0g"
 #"${OMR_FEED_SRC:-1bd9c2d824dc8f3e556686a0bacea4262a08e9de}"
 
