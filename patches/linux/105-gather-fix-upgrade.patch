@@ -1,0 +1,12 @@
+diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-03-03 23:53:51.676896461 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-04-16 14:32:34.867304743 +0800
+@@ -44,7 +44,7 @@
+ 
+ / {
+ 	model = "GATHER NANO V1.1";
+-	compatible = "allwinner,sun8i-h3";
++	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
+ 	
+ 	gpio-keys-polled {
+ 		compatible = "gpio-keys-polled";
