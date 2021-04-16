@@ -324,11 +324,8 @@ fi
 echo "Done"
 
 # add nanopi neo core supported
-[ ! -e target/linux/sunxi/patches-5.4/101-sunxi-h3-nanopi-neo-core-add-emmc.patch ] && cp ../../patches/101-sunxi-h3-nanopi-neo-core-add-emmc.patch target/linux/sunxi/patches-5.4/101-sunxi-h3-nanopi-neo-core-add-emmc.patch
-[ ! -e target/linux/sunxi/patches-5.4/102-GATHER-Linux-Mod.patch ] && cp ../../patches/102-GATHER-Linux-Mod.patch target/linux/sunxi/patches-5.4/102-GATHER-Linux-Mod.patch
-[ ! -e target/linux/sunxi/patches-5.4/103-gather-add-button-led.patch ] && cp ../../patches/103-gather-add-button-led.patch target/linux/sunxi/patches-5.4/103-gather-add-button-led.patch
-[ ! -e package/boot/uboot-sunxi/patches/254-sunxi-h3-add-nanopi-neo-core.patch ] && cp ../../patches/254-sunxi-h3-add-nanopi-neo-core.patch package/boot/uboot-sunxi/patches/254-sunxi-h3-add-nanopi-neo-core.patch
-[ ! -e package/boot/uboot-sunxi/patches/253-Gather-Uboot-Mod.patch ] && cp ../../patches/253-Gather-Uboot-Mod.patch package/boot/uboot-sunxi/patches/253-Gather-Uboot-Mod.patch
+for i in `ls ../../patches/linux`; do [ ! -e target/linux/sunxi/patches-5.4/$i ] && cp ../../patches/linux/$i target/linux/sunxi/patches-5.4/$i; done
+for i in `ls ../../patches/uboot`; do [ ! -e package/boot/uboot-sunxi/patches/$i ] && cp ../../patches/uboot/$i package/boot/uboot-sunxi/patches/$i; done
 cp ../../patches/boot/uEnv-default.txt package/boot/uboot-sunxi/uEnv-default.txt
 cp ../../patches/boot/uEnv-pangolin.txt package/boot/uboot-sunxi/uEnv-pangolin.txt
 
