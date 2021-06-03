@@ -44,26 +44,6 @@ jobs:
         ref: 0.78.0
         path: './omr'
         token: ${{ secrets.PRI_TOKEN }}
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ matrix.OMR_TARGET }} ${{ github.job }}
-        draft: false
-        prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
-        asset_path: ./omr/config-nanopi_neo
-        asset_name: config-nanopi_neo
-        asset_content_type: application/octet-stream
     - name: Build toolchain
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
@@ -87,14 +67,30 @@ jobs:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
         make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j1 V=s
-    - name: Gzip
-      run: |
-        mkdir ./omr/${{ matrix.OMR_TARGET }}/output
-        tar -czvf ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}.tar.gz ./omr/${{ matrix.OMR_TARGET }}/source/.config ./omr/${{ matrix.OMR_TARGET }}/source/bin
     - name: zip # This would actually build your project, using zip for an example artifact
       run: |
-        mkdir ./omr/${{ matrix.OMR_TARGET }}/output
-        zip -r ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}${{ github.job }}.zip ./omr/${{ matrix.OMR_TARGET }}/source/.config ./omr/${{ matrix.OMR_TARGET }}/source/bin
+        mkdir ./omr/${{ matrix.OMR_TARGET }}/output || true
+        zip -r ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}${{ github.sha }}.zip ./omr/${{ matrix.OMR_TARGET }}/source/.config ./omr/${{ matrix.OMR_TARGET }}/source/bin
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
+      with:
+        tag_name: ${{ matrix.OMR_TARGET }}${{ github.sha }}
+        release_name: Release ${{ matrix.OMR_TARGET }} ${{ github.sha }}
+        draft: false
+        prerelease: false
+    - name: Upload Release Asset
+      id: upload-release-asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
+        asset_path: ./omr/config-nanopi_neo
+        asset_name: config-nanopi_neo
+        asset_content_type: application/octet-stream
     - name: Upload Release Asset1
       id: upload-release-asset1
       uses: actions/upload-release-asset@v1
@@ -102,8 +98,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}${{ github.job }}.zip
-        asset_name: ${{ matrix.OMR_TARGET }}${{ github.job }}.zip
+        asset_path: ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}${{ github.sha }}.zip
+        asset_name: ${{ matrix.OMR_TARGET }}${{ github.sha }}.zip
         asset_content_type: application/zip
 
 #    - name: Deliver firmware
