@@ -1,9 +1,9 @@
+diff --color -Naru a/arch/arm/configs/sunxi_defconfig b/arch/arm/configs/sunxi_defconfig
 --- a/arch/arm/configs/sunxi_defconfig	2020-12-30 18:51:48.000000000 +0800
-+++ b/arch/arm/configs/sunxi_defconfig	2021-06-02 22:59:06.543474379 +0800
-@@ -151,3 +151,6 @@
++++ b/arch/arm/configs/sunxi_defconfig	2021-06-04 01:00:41.754515276 +0800
+@@ -151,3 +151,5 @@
  CONFIG_PRINTK_TIME=y
  CONFIG_DEBUG_FS=y
  CONFIG_CRYPTO_DEV_SUN4I_SS=y
-+CONFIG_FB_TFT=y
-+CONFIG_FB_TFT_SSD1306=y
 +CONFIG_MCP320X=y
++CONFIG_FB_SSD1307=y
