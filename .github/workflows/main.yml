@@ -67,14 +67,26 @@ jobs:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
         make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source target/install -j1 V=s
-    - name: Deliver firmware
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.OMR_TARGET }}
-        path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ matrix.OMR_TARGET }}
-        path: ./omr/${{ matrix.OMR_TARGET }}/source/bin
+    - name: Gzip
+      run: |
+        mkdir ./omr/${{ matrix.OMR_TARGET }}/output
+        tar -czvf ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}.tar.gz ./omr/${{ matrix.OMR_TARGET }}/source/.config ./omr/${{ matrix.OMR_TARGET }}/source/bin
+
+      - name: Upload to release
+        uses: JasonEtco/upload-to-release@master
+        with:
+          args: ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}.tar.gz application/octet-stream
+        env:
+          GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
+
+#    - name: Deliver firmware
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: ${{ matrix.OMR_TARGET }}
+#        path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
+#    - name: Upload artifacts
+#      uses: actions/upload-artifact@v2
+#      with:
+#        name: ${{ matrix.OMR_TARGET }}
+#        path: ./omr/${{ matrix.OMR_TARGET }}/source/bin
 
