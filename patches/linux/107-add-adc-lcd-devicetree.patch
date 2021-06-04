@@ -1,31 +1,31 @@
 diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
---- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-03-03 23:53:51.676896461 +0800
-+++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-06-04 01:10:54.518962598 +0800
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts 2021-03-03 23:53:51.676896461 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts 2021-06-04 10:56:29.495595689 +0800
 @@ -167,3 +167,27 @@
- 	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
- 	status = "okay";
+        usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
+        status = "okay";
  };
 +
 +&spi0 {
 +        status = "okay";
 +        
 +        mcp3201_00: mcp3201@0 {
-+			compatible = "microchip,mcp3201";
-+			reg = <0>;
-+			spi-max-frequency = <1600000>;
-+			spi-cpha = <1>;
-+			spi-cpol = <1>;
-+		};
-+}
++                       compatible = "microchip,mcp3201";
++                       reg = <0>;
++                       spi-max-frequency = <1600000>;
++                       spi-cpha = <1>;
++                       spi-cpol = <1>;
++               };
++};
 +
 +&i2c2 {
 +        status = "okay";
 +
-+		ssd1306: oled@3c{
-+			compatible = "solomon,ssd1306fb-i2c";
-+			reg = <0x3c>;
-+			solomon,width = <128>;
-+			solomon,height = <64>;
-+			solomon,page-offset = <0>;
-+		};
-+}
++               ssd1306: oled@3c {
++                       compatible = "solomon,ssd1306fb-i2c";
++                       reg = <0x3c>;
++                       solomon,width = <128>;
++                       solomon,height = <64>;
++                       solomon,page-offset = <0>;
++               };
++};
