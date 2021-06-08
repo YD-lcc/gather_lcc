@@ -81,8 +81,8 @@ jobs:
         release_name: Release ${{ matrix.OMR_TARGET }} ${{ github.sha }}
         draft: false
         prerelease: false
-    - name: Upload Release Asset
-      id: upload-release-asset
+    - name: Upload Release Asset config-neo
+      id: upload-release-asset-config-neo
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
@@ -91,8 +91,18 @@ jobs:
         asset_path: ./omr/config-nanopi_neo
         asset_name: config-nanopi_neo
         asset_content_type: application/octet-stream
-    - name: Upload Release Asset1
-      id: upload-release-asset1
+    - name: Upload Release Asset config
+      id: upload-release-asset-config
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
+        asset_path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
+        asset_name: config-nanopi_neo
+        asset_content_type: application/octet-stream
+    - name: Upload Release Asset image
+      id: upload-release-asset-image
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
