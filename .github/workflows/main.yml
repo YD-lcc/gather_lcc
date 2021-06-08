@@ -60,7 +60,8 @@ jobs:
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
-        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
+        # || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
     - name: Build image
       working-directory: ./omr
       env:
