@@ -385,6 +385,8 @@ else
 	scripts/feeds install -a -d y -f -p openmptcprouter
 fi
 
+scripts/feeds install -d y -p packages lcd4linux
+
 #Mod
 cp -R ../../patches/openmptcprouter/* ../../feeds/openmptcprouter/
 cp -R ../../patches/luci/* ../../feeds/luci/
