@@ -119,3 +119,5 @@ CONFIG_PACKAGE_libpng=y
 CONFIG_PACKAGE_libusb-1.0=y
 CONFIG_PACKAGE_libusb-compat=y
 CONFIG_PACKAGE_libgd=y
+CONFIG_PACKAGE_serdisplib=y
+CONFIG_PACKAGE_serdisplib-tools=y

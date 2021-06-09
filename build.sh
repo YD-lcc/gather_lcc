@@ -386,6 +386,7 @@ else
 fi
 
 scripts/feeds install -d y -p packages lcd4linux
+scripts/feeds install -d y -p packages serdisplib
 
 #Mod
 cp -R ../../patches/openmptcprouter/* ../../feeds/openmptcprouter/
