@@ -60,8 +60,7 @@ jobs:
       env:
         OMR_TARGET: ${{ matrix.OMR_TARGET }}
       run: |
-        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) V=s
-        # || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
+        make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j$(nproc) || make IGNORE_ERRORS=m -C $OMR_TARGET/source package/{compile,install,index} -j1 V=s
     - name: Build image
       working-directory: ./omr
       env:
@@ -92,16 +91,6 @@ jobs:
         asset_path: ./omr/config-nanopi_neo
         asset_name: config-nanopi_neo
         asset_content_type: application/octet-stream
-    - name: Upload Release Asset config
-      id: upload-release-asset-config
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
-        asset_path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
-        asset_name: config-nanopi_neo
-        asset_content_type: application/octet-stream
     - name: Upload Release Asset image
       id: upload-release-asset-image
       uses: actions/upload-release-asset@v1
@@ -112,6 +101,16 @@ jobs:
         asset_path: ./omr/${{ matrix.OMR_TARGET }}/output/${{ matrix.OMR_TARGET }}${{ github.sha }}.zip
         asset_name: ${{ matrix.OMR_TARGET }}${{ github.sha }}.zip
         asset_content_type: application/zip
+    - name: Upload Release Asset config
+      id: upload-release-asset-config
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
+        asset_path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
+        asset_name: .config-nanopi_neo
+        asset_content_type: application/octet-stream
 
 #    - name: Deliver firmware
 #      uses: actions/upload-artifact@v2
