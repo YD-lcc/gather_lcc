@@ -374,6 +374,10 @@ scripts/feeds update -a
 #echo "Done"
 #cd "$OMR_TARGET/source"
 
+rm -rf feeds/openmptcprouter/serdisplib
+scripts/feeds install -d y -p packages lcd4linux
+scripts/feeds install -d y -p packages serdisplib
+
 if [ "$OMR_ALL_PACKAGES" = "yes" ]; then
 	scripts/feeds install -a -d m -p packages
 	scripts/feeds install -a -d m -p luci
@@ -384,9 +388,6 @@ if [ -n "$CUSTOM_FEED" ]; then
 else
 	scripts/feeds install -a -d y -f -p openmptcprouter
 fi
-
-scripts/feeds install -d y -p packages lcd4linux
-scripts/feeds install -d y -p packages serdisplib
 
 #Mod
 cp -R ../../patches/openmptcprouter/* ../../feeds/openmptcprouter/
