@@ -135,7 +135,7 @@ cat > "$OMR_TARGET/source/feeds.conf" <<EOF
 src-link packages $(readlink -f feeds/packages)
 src-link luci $(readlink -f feeds/luci)
 src-link openmptcprouter $(readlink -f "$OMR_FEED")
-src-git NanoHatOLED https://gitee.com/zoums/GatherOLED.git
+src-link NanoHatOLED $(readlink -f patches/GatherOLED)
 EOF
 
 if [ -n "$CUSTOM_FEED" ]; then
