@@ -1,6 +1,6 @@
 diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
 --- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-03-03 23:53:51.676896461 +0800
-+++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-06-09 18:04:28.688629247 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-06-21 01:04:44.131337760 +0800
 @@ -167,3 +167,29 @@
  	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
  	status = "okay";
@@ -22,12 +22,12 @@ diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/d
 +&i2c2 {
 +        status = "okay";
 +
-+		ssd1306: oled@3c {
-+			compatible = "solomon,ssd1306fb-i2c";
-+			reg = <0x3c>;
-+			solomon,width = <128>;
-+			solomon,height = <64>;
-+			solomon,page-offset = <0>;
-+			solomon,com-invdir;
-+		};
++/*		ssd1306: oled@3c {
++*			compatible = "solomon,ssd1306fb-i2c";
++*			reg = <0x3c>;
++*			solomon,width = <128>;
++*			solomon,height = <64>;
++*			solomon,page-offset = <0>;
++*			solomon,com-invdir;
++*		};*/
 +};

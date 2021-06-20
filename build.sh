@@ -135,6 +135,7 @@ cat > "$OMR_TARGET/source/feeds.conf" <<EOF
 src-link packages $(readlink -f feeds/packages)
 src-link luci $(readlink -f feeds/luci)
 src-link openmptcprouter $(readlink -f "$OMR_FEED")
+src-git NanoHatOLED https://gitee.com/zoums/GatherOLED.git
 EOF
 
 if [ -n "$CUSTOM_FEED" ]; then
@@ -375,8 +376,9 @@ scripts/feeds update -a
 #cd "$OMR_TARGET/source"
 
 rm -rf feeds/openmptcprouter/serdisplib
-scripts/feeds install -d y -p packages lcd4linux
-scripts/feeds install -d y -p packages serdisplib
+#scripts/feeds install -d y -p packages lcd4linux
+#scripts/feeds install -d y -p packages serdisplib
+scripts/feeds install gatheroled
 
 if [ "$OMR_ALL_PACKAGES" = "yes" ]; then
 	scripts/feeds install -a -d m -p packages
