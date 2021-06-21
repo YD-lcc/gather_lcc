@@ -1,0 +1,17 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2009-2010 OpenWrt.org
+
+START=25
+STOP=15
+workdir=/usr/share/GatherOLED
+
+start() {
+		
+		# 启动 OLED
+		cd ${workdir} && python3 ${workdir}/gather_oled.py > /tmp/gatherled-python.log 2>&1 &
+}
+
+stop() {
+		# 关闭 OLED
+		kill -9 `ps w|grep -E "gather_oled"|grep -v "grep"|awk '{print $1}'` 2>/dev/null
+}
