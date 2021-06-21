@@ -112,7 +112,7 @@ detect_mac80211() {
 			set wireless.default_radio${devidx}.mode=ap
 			set wireless.default_radio${devidx}.ssid=GATHER
 			set wireless.default_radio${devidx}.encryption='psk2'
-			set wireless.default_radio${devidx}.key='12345678'
+			set wireless.default_radio${devidx}.key='gathernano'
 EOF
 		uci -q commit wireless
 

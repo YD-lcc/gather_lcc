@@ -4,7 +4,7 @@ diff --color -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/d
 @@ -44,7 +44,7 @@
  
  / {
- 	model = "GATHER NANO V1.1";
+ 	model = "GATHER NANO V1.2";
 -	compatible = "allwinner,sun8i-h3";
 +	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
  	

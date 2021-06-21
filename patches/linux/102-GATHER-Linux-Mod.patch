@@ -7,7 +7,7 @@ diff -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i
  / {
 -	model = "FriendlyARM NanoPi NEO";
 -	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
-+	model = "GATHER NANO V1.1";
++	model = "GATHER NANO V1.2";
 +	compatible = "allwinner,sun8i-h3";
  };
  
