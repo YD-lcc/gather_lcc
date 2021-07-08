@@ -197,14 +197,14 @@ generate_network() {
 				set network.$1.ipaddr='$ipad'
 				set network.$1.netmask='$netm'
 			EOF
-			[ -e /proc/sys/net/ipv6 ] && uci set network.$1.ip6assign='60'
+			[ -e /proc/sys/net/ipv6 ] && set network.$1.ip6assign='60'
 		;;
 
 		dhcp)
 			# fixup IPv6 slave interface if parent is a bridge
 			[ "$type" = "bridge" ] && ifname="br-$1"
 
-			uci set network.$1.proto='dhcp'
+			set network.$1.proto='dhcp'
 			[ -e /proc/sys/net/ipv6 ] && {
 				uci -q batch <<-EOF
 					delete network.${1}6
@@ -464,7 +464,7 @@ generate_led() {
 		usbport)
 			local ports port
 			json_get_values ports ports
-			uci set system.$cfg.trigger='usbport'
+			set system.$cfg.trigger='usbport'
 			for port in $ports; do
 				uci add_list system.$cfg.port=$port
 			done
@@ -534,6 +534,54 @@ generate_gpioswitch() {
 	json_select ..
 }
 
+generate_gather_network() {
+	local i=$1
+	local defif=$2
+	local multipath=$3
+	uci -q batch <<-EOF
+		set network.wan${i}='interface'
+		set network.wan${i}.ifname=${defif}
+		set network.wan${i}.proto='dhcp'
+		set openmptcprouter.wan${i}='interface'
+		set network.wan${i}.ip4table='wan'
+		set network.wan${i}.multipath=${multipath}
+		set openmptcprouter.wan${i}.multipath=${multipath}
+		set network.wan${i}.defaultroute='0'
+		set network.omrvpn.proto='none'
+		set network.lan.defaultroute='0'
+		set network.lan.peerdns='0'
+		reorder network.wan${i}=$((i+2))
+		set sqm.wan${i}=queue
+		set sqm.wan${i}.interface=${defif}
+		set sqm.wan${i}.qdisc='fq_codel'
+		set sqm.wan${i}.script='simple.qos'
+		set sqm.wan${i}.qdisc_advanced='0'
+		set sqm.wan${i}.linklayer='none'
+		set sqm.wan${i}.enabled='0'
+		set sqm.wan${i}.debug_logging='0'
+		set sqm.wan${i}.verbosity='5'
+		set sqm.wan${i}.download='0'
+		set sqm.wan${i}.upload='0'
+		set sqm.wan${i}.iqdisc_opts='autorate-ingress nat dual-dsthost'
+		set sqm.wan${i}.eqdisc_opts='nat dual-srchost'
+		set sqm.lan=queue
+		set sqm.lan.interface='br-lan'
+		set sqm.lan.qdisc='fq_codel'
+		set sqm.lan.script='simple.qos'
+		set sqm.lan.qdisc_advanced='0'
+		set sqm.lan.linklayer='none'
+		set sqm.lan.enabled='0'
+		set sqm.lan.debug_logging='0'
+		set sqm.lan.verbosity='5'
+		set sqm.lan.download='0'
+		set sqm.lan.upload='0'
+		set sqm.lan.iqdisc_opts='autorate-ingress nat dual-dsthost'
+		set sqm.lan.eqdisc_opts='nat dual-srchost'
+		add_list vnstat.@vnstat[-1].interface=${defif}
+		add_list firewall.@zone[1].network=wan${i}
+	EOF
+}
+
 json_init
 json_load "$(cat ${CFG})"
 
@@ -567,6 +615,13 @@ if [ ! -s /etc/config/network ]; then
 		add_list dhcp.@dnsmasq[0].server='223.6.6.6'
 		add_list dhcp.@dnsmasq[0].server='114.114.114.114'
 	EOF
+	
+	generate_gather_network 1 eth1 off
+	generate_gather_network 2 usb0 master
+	generate_gather_network 3 usb1 on
+	generate_gather_network 4 usb2 on
+	generate_gather_network 5 usb3 on
+	generate_gather_network 6 usb4 on
 fi
 
 if [ ! -s /etc/config/system ]; then

