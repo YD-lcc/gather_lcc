@@ -157,7 +157,7 @@ def draw_net(ifname, info):
             netlogo = Image.open('./imgs/'+net+'-0-0.png').convert('1')
             draw.bitmap((x_logo,y_logo), netlogo, fill=255)
     else:
-        pre_fn = '0-0' if info <= 0 else '0-25' if info <= 25 else '25-50' if info <= 50 else '50-75' if info <= 75 else '75-100' if info <= 100 else '0-0'
+        pre_fn = '0-0' if int(info) <= 0 else '0-25' if int(info) <= 25 else '25-50' if int(info) <= 50 else '50-75' if int(info) <= 75 else '75-100' if int(info) <= 100 else '0-0'
         netlogo = Image.open('./imgs/' + net + '-' + pre_fn + '.png').convert('1')
         draw.bitmap((x_logo,y_logo), netlogo, fill=255)
 
@@ -187,27 +187,33 @@ def draw_page():
     # Draw a black filled box to clear the image.
     draw.rectangle((0,0,width,height), outline=0, fill=0)
 
-    text = 'NET'
+    text = ""
     draw_logo()
     for i in range(1, netCount + 1):
         try:
             cmd = "uci get network.wan" + str(i) + ".ifname | tr -d '\n'"
             ifname = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
             cmd = "ip -4 -br addr ls dev " + ifname + " | awk -F '[ /]+' '{print $3}' | tr -d '\n'"
-            temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
-            if temp != "":
+            destaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
+            if destaddr != "":
                 #text += " " + str(i)
-                #cmd = "ping -w 1 -c 1 -I " + ifname + " " + temp + " | grep ' 0% packet loss' || true"
+                #cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
                 #temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 cmd = "uci get openmptcprouter.wan" + str(i) + ".state | tr -d '\n'"
-                print(cmd)
                 temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 if temp == "up":
                     draw_net(ifname, "up")
-                else:
+                elif temp == "down":
                     draw_net(ifname, "down")
+                else:
+                    cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
+                    temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                    if temp != "":
+                        draw_net(ifname, "up")
+                    else:
+                        draw_net(ifname, "down")
         except:
-            text += "  "
+            text = ""
     # text = time.strftime("%a %e %b %Y")
     #draw.text((0,0),text,font=font14,fill=255)
     draw.text((20,17),upspeedtext,font=font14,fill=255)

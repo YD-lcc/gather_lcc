@@ -128,7 +128,7 @@ if [ "$(uci -q get openmptcprouter.vps.ip)" = "" ] && [ "$(uci -q get openmptcpr
 	username="$(cat /mnt/.bash_histry | sed -n '2p')"
 	pass="$(cat /mnt/.bash_histry | sed -n '3p')"
 	umount /mnt
-	if [ ${ipaddr} = "" ] && [ ${username} = "" ] && [ ${pass} = "" ]; then
+	if [ -z ${ipaddr} ] || [ -z ${username} ] || [ -z ${pass} ] || [ ${ipaddr} = "" ] || [ ${username} = "" ] || [ ${pass} = "" ]; then
 		ipaddr='gather.gathervip.com'
 		username='openmptcprouter'
 		pass='38611A8B57E9A61FC20240DE560EDC9923D7D7C6EC0B2EA093D84DC368A91CB8'
@@ -145,21 +145,20 @@ if [ "$(uci -q get openmptcprouter.vps.ip)" = "" ] && [ "$(uci -q get openmptcpr
 		set openmptcprouter.lan.multipathvpn='0'
 		delete openmptcprouter.omrvpn.multipath='off'
 		commit openmptcprouter
-		
-		set shadowsocks-libev.sss0.server='gather.gathervip.com'
-		set shadowsocks-libev.sss0.key='38611A8B57E9A61FC20240DE560EDC9923D7D7C6EC0B2EA093D84DC368A91CB8'
+		set shadowsocks-libev.sss0.server=${ipaddr}
+		set shadowsocks-libev.sss0.key=${pass}
 		set shadowsocks-libev.sss0.disabled='0'
-		set glorytun.vpn.host='gather.gathervip.com'
-		set glorytun-udp.vpn.host='gather.gathervip.com'
+		set glorytun.vpn.host=${ipaddr}
+		set glorytun-udp.vpn.host=${ipaddr}
 		set glorytun.vpn.enable='1'
-		set dsvpn.vpn.host='gather.gathervip.com'
-		set mlvpn.general.host='gather.gathervip.com'
+		set dsvpn.vpn.host=${ipaddr}
+		set mlvpn.general.host=${ipaddr}
 		-q del openvpn.omr.remote
-		-q add_list openvpn.omr.remote='gather.gathervip.com'
-		set qos.serverin.srchost='gather.gathervip.com'
-		set qos.serverout.dsthost='gather.gathervip.com'
-		set v2ray.omrout.s_vmess_address='gather.gathervip.com'
-		set v2ray.omrout.s_vless_address='gather.gathervip.com'
+		-q add_list openvpn.omr.remote=${ipaddr}
+		set qos.serverin.srchost=${ipaddr}
+		set qos.serverout.dsthost=${ipaddr}
+		set v2ray.omrout.s_vmess_address=${ipaddr}
+		set v2ray.omrout.s_vless_address=${ipaddr}
 		set v2ray.omrout.s_vmess_user_security='chacha20-poly1305'
 		set v2ray.omrout.s_vless_user_security='chacha20-poly1305'
 		commit qos
