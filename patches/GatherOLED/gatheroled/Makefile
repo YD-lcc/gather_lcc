@@ -48,7 +48,7 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/etc/init.d
 	$(INSTALL_BIN) ./files/gatheroled $(1)/etc/init.d/gatheroled
 	$(INSTALL_DIR) $(1)/usr/share/GatherOLED
-	$(CP) ./files/NanoHatOLED/* $(1)/usr/share/GatherOLED
+	$(CP) -r ./files/NanoHatOLED/* $(1)/usr/share/GatherOLED
 endef
 
 define Package/$(PKG_NAME)/postinst

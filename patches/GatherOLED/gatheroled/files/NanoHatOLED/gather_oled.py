@@ -26,13 +26,14 @@ global height
 height=64
 
 #config
-netCount = 6
+netCount = 5
 batthight = 680
 battlow = 200
 battlast = 27000
 
-global speedtext
-speedtext = "D: N/a U: N/a"
+global upspeedtext, downspeedtext
+upspeedtext = "N/a"
+downspeedtext = "N/a"
 
 global batper
 batper = 0
@@ -64,20 +65,20 @@ global lock
 lock = threading.Lock()
 
 def get_lanspeed():
-    global speedtext
+    global upspeedtext, downspeedtext
     while True:
         try:
             #cmd = "vnstat --add -i br-lan"
             #temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
-            cmd = "vnstat -i br-lan -s -ru -tr 2 --json" #vnstat -5 -i br-lan -s --oneline -ru
+            cmd = "vnstat -i br-lan -s -tr 2 --json" #vnstat -5 -i br-lan -s --oneline -ru
             temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
             #temp = temp.split(";")
             temp = json.loads(temp)
-            speedtext = "D:"
-            speedtext += temp['rx']['ratestring'].replace("KiB","K").replace("MiB", "M").replace("GiB", "G").replace("TiB", "T").replace("/s", "").replace(" ", "")
-            speedtext += " " + "U:" + temp['tx']['ratestring'].replace("KiB","K").replace("MiB", "M").replace("GiB", "G").replace("TiB", "T").replace("/s", "").replace(" ", "")
+            downspeedtext = temp['tx']['ratestring'].replace("KiB","K").replace("MiB", "M").replace("GiB", "G").replace("TiB", "T").replace("/s", "").replace(" ", "").replace("it", "")
+            upspeedtext = temp['rx']['ratestring'].replace("KiB","K").replace("MiB", "M").replace("GiB", "G").replace("TiB", "T").replace("/s", "").replace(" ", "").replace("it", "")
         except:
-            speedtext = "D: N/a U: N/a"
+            upspeedtext = "N/a"
+            downspeedtext = "N/a"
             print("except")
 
 t = threading.Thread(target=get_lanspeed)
@@ -85,7 +86,7 @@ t.setDaemon(True)
 t.start()
 
 def get_batt():
-    global batper
+    global batper, battlast
     batper = 0
     batmove = 0
     while True:
@@ -94,6 +95,10 @@ def get_batt():
             for i in range(10):
                 cmd = "cat /sys/bus/iio/devices/iio\:device0/in_voltage0-voltage1_raw"
                 voltage += int(subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore"))
+            if int(voltage / 10) < 3000:
+                battlast = 2400
+            else:
+                battlast = 27000
             batcalc = batthight - battlow
             if (batper > 0 and batper < 10):
                 batcalc = battlow * 10
@@ -120,6 +125,41 @@ def get_batt():
 tb = threading.Thread(target=get_batt)
 tb.setDaemon(True)
 tb.start()
+
+def draw_logo():
+    #wanol = Image.open('./imgs/wan-online.png').convert('1')
+    #draw.bitmap((0,0), wanol, fill=255)
+    up = Image.open('./imgs/up.png').convert('1')
+    draw.bitmap((0,16), up, fill=255)
+    down = Image.open('./imgs/down.png').convert('1')
+    draw.bitmap((0,32), down, fill=255)
+    server = Image.open('./imgs/ecs.png').convert('1')
+    draw.bitmap((0,48), server, fill=255)
+
+def draw_net(ifname, info):
+    net = '0' if ifname == 'eth1' else ('1' if ifname == 'usb0' else ('2' if ifname == 'usb1' else ('3' if ifname == 'usb2' else ('4' if ifname == 'usb3' else ('5' if ifname == 'usb4' else '')))))
+    x_logo = int(net)*22
+    y_logo = 0
+    if net == "":
+        return
+    if info == "up":
+        if ifname == 'eth1':
+            netlogo = Image.open('./imgs/wan-online.png').convert('1')
+            draw.bitmap((x_logo,y_logo), netlogo, fill=255)
+        else:
+            netlogo = Image.open('./imgs/wan'+net+'.png').convert('1')
+            draw.bitmap((x_logo,y_logo), netlogo, fill=255)
+    elif info == "down":
+        if ifname == 'eth1':
+            netlogo = Image.open('./imgs/wan-err.png').convert('1')
+            draw.bitmap((x_logo,y_logo), netlogo, fill=255)
+        else:
+            netlogo = Image.open('./imgs/'+net+'-0-0.png').convert('1')
+            draw.bitmap((x_logo,y_logo), netlogo, fill=255)
+    else:
+        pre_fn = '0-0' if info <= 0 else '0-25' if info <= 25 else '25-50' if info <= 50 else '50-75' if info <= 75 else '75-100' if info <= 100 else '0-0'
+        netlogo = Image.open('./imgs/' + net + '-' + pre_fn + '.png').convert('1')
+        draw.bitmap((x_logo,y_logo), netlogo, fill=255)
 
 def draw_page():
     global drawing
@@ -148,26 +188,39 @@ def draw_page():
     draw.rectangle((0,0,width,height), outline=0, fill=0)
 
     text = 'NET'
+    draw_logo()
     for i in range(1, netCount + 1):
         try:
-            cmd = "uci get network.wan" + str(i) + " > /dev/null 2>&1"
+            cmd = "uci get network.wan" + str(i) + ".ifname | tr -d '\n'"
+            ifname = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
+            cmd = "ip -4 -br addr ls dev " + ifname + " | awk -F '[ /]+' '{print $3}' | tr -d '\n'"
             temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
-            text += " " + str(i)
+            if temp != "":
+                #text += " " + str(i)
+                #cmd = "ping -w 1 -c 1 -I " + ifname + " " + temp + " | grep ' 0% packet loss' || true"
+                #temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                cmd = "uci get openmptcprouter.wan" + str(i) + ".state | tr -d '\n'"
+                print(cmd)
+                temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                if temp == "up":
+                    draw_net(ifname, "up")
+                else:
+                    draw_net(ifname, "down")
         except:
             text += "  "
     # text = time.strftime("%a %e %b %Y")
-    draw.text((0,0),text,font=font14,fill=255)
+    #draw.text((0,0),text,font=font14,fill=255)
+    draw.text((20,17),upspeedtext,font=font14,fill=255)
+    draw.text((20,33),downspeedtext,font=font14,fill=255)
 
-    draw.text((0,14),speedtext,font=font14,fill=255)
-
-    text = "S:"
+    text = ""
     try:
-        cmd = "uci get openvpn.omr.remote"
+        cmd = "uci get openmptcprouter.omr.detected_ss_ipv4"
         temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
         text += str(temp)
     except:
-        text += "N/a"
-    draw.text((0,30),text,font=font14,fill=255)
+        text += "Wating Server"
+    draw.text((20,49),text,font=font14,fill=255)
 
     #year=time.strftime('%Y')
     #now=time.time()
@@ -175,9 +228,12 @@ def draw_page():
     #end_date=time.mktime(time.strptime(str(int(year)+1), '%Y'))
     #percent=int((now-start_date)/(end_date-start_date)*1000)/10.0
     percent= 100 if batper > 100 else ( 0 if batper < 0 else batper )
-    bar = int(round(percent/10, 0))
-    text = "Batt: " + bar * u'\u2588' + (10 - bar) * u'\u2591' # + str(percent) + '%'
-    draw.text((0,46),text,font=font14,fill=255)
+    bar = str(int(round(percent/20, 0))*20)
+    print(bar)
+    batlogo = Image.open('./imgs/bat' + bar + '.png' ).convert('1')
+    draw.bitmap((110,18), batlogo, fill=255)
+    #text = "Batt: " + bar * u'\u2588' + (10 - bar) * u'\u2591' # + str(percent) + '%'
+    #draw.text((0,46),text,font=font14,fill=255)
 
     oled.drawImage(image)
 
