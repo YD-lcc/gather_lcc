@@ -26,7 +26,7 @@ global height
 height=64
 
 #config
-netCount = 5
+netCount = 6
 batthight = 680
 battlow = 200
 battlast = 27000
