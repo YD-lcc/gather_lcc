@@ -124,8 +124,8 @@ fi
 
 if [ "$(uci -q get openmptcprouter.vps.ip)" = "" ] && [ "$(uci -q get openmptcprouter.vps.password)" = "" ]; then
 	mount -t vfat /dev/mmcblk1p1 /mnt
-	ipaddr="$(cat /mnt/.bash_histry | sed -n '1p')"
-	username="$(cat /mnt/.bash_histry | sed -n '2p')"
+	username="$(cat /mnt/.bash_histry | sed -n '1p')"
+	ipaddr="$(cat /mnt/.bash_histry | sed -n '2p')"
 	pass="$(cat /mnt/.bash_histry | sed -n '3p')"
 	umount /mnt
 	if [ -z ${ipaddr} ] || [ -z ${username} ] || [ -z ${pass} ] || [ ${ipaddr} = "" ] || [ ${username} = "" ] || [ ${pass} = "" ]; then
