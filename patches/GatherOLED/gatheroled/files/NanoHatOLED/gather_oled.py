@@ -133,8 +133,8 @@ def draw_logo():
     draw.bitmap((0,16), up, fill=255)
     down = Image.open('./imgs/down.png').convert('1')
     draw.bitmap((0,32), down, fill=255)
-    server = Image.open('./imgs/ecs.png').convert('1')
-    draw.bitmap((0,48), server, fill=255)
+    #server = Image.open('./imgs/ecs.png').convert('1')
+    #draw.bitmap((0,48), server, fill=255)
 
 def draw_net(ifname, info):
     net = '0' if ifname == 'eth1' else ('1' if ifname == 'usb0' else ('2' if ifname == 'usb1' else ('3' if ifname == 'usb2' else ('4' if ifname == 'usb3' else ('5' if ifname == 'usb4' else '')))))
@@ -157,7 +157,7 @@ def draw_net(ifname, info):
             netlogo = Image.open('./imgs/'+net+'-0-0.png').convert('1')
             draw.bitmap((x_logo,y_logo), netlogo, fill=255)
     else:
-        pre_fn = '0-0' if int(info) <= 0 else '0-25' if int(info) <= 25 else '25-50' if int(info) <= 50 else '50-75' if int(info) <= 75 else '75-100' if int(info) <= 100 else '0-0'
+        pre_fn = '0-0' if int(info) <= 0 else '0-25' if int(info) <= 25 else '25-50' if int(info) <= 50 else '50-75' if int(info) <= 75 else '75-100' if int(info) <= 255 else '0-0'
         netlogo = Image.open('./imgs/' + net + '-' + pre_fn + '.png').convert('1')
         draw.bitmap((x_logo,y_logo), netlogo, fill=255)
 
@@ -199,6 +199,42 @@ def draw_page():
                 #text += " " + str(i)
                 #cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
                 #temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                getsignal = False
+                cmd = "(uci get openmptcprouter.wan" + str(i) + ".manufacturer || uci get network.wan" + str(i) + ".proto || true) | tr -d '\n'"
+                temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                if temp == "huawei":
+                    cmd = "(omr-huawei " + destaddr + " all || true) | awk -F';' '{print $1}'"
+                    temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    if temp != "":
+                        draw_net(ifname, temp)
+                        continue
+                elif temp == "qmi":
+                    cmd = "(uci get network.wan" + str(i) + ".device || true) | tr -d '\n'"
+                    device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    if device != "":
+                        cmd = "(omr-qmi " + device + " all || true) | awk -F';' '{print $1}'"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        if temp != "":
+                            draw_net(ifname, temp)
+                            continue
+                elif temp == "3g":
+                    cmd = "(uci get network.wan" + str(i) + ".device || true) | tr -d '\n'"
+                    device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    if device != "":
+                        cmd = "(omr-3g " + device + " || true) | tr -d '\n'"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        if temp != "":
+                            draw_net(ifname, temp)
+                            continue
+                elif temp == "modemmanager":
+                    cmd = "(uci get network.wan" + str(i) + ".device || true) | tr -d '\n'"
+                    device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    if device != "":
+                        cmd = "(omr-modemmanager " + device + " all || true) | awk -F';' '{print $1}'"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        if temp != "":
+                            draw_net(ifname, temp)
+                            continue
                 cmd = "uci get openmptcprouter.wan" + str(i) + ".state | tr -d '\n'"
                 temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 if temp == "up":
@@ -225,8 +261,8 @@ def draw_page():
         temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
         text += str(temp)
     except:
-        text += "Wating Server"
-    draw.text((20,49),text,font=font14,fill=255)
+        text += "Wating Server..."
+    draw.text((0,49),text,font=font14,fill=255)
 
     #year=time.strftime('%Y')
     #now=time.time()
