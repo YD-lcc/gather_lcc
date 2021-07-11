@@ -193,8 +193,14 @@ def draw_page():
         try:
             cmd = "uci get network.wan" + str(i) + ".ifname | tr -d '\n'"
             ifname = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
-            cmd = "ip -4 -br addr ls dev " + ifname + " | awk -F '[ /]+' '{print $3}' | tr -d '\n'"
+            cmd = "ip -4 r list dev " + ifname + " | grep default | awk '{print $3}' | tr -d '\n'"
             destaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
+            if destaddr == "":
+                cmd = "ip -4 r list dev " + ifname + " | grep kernel | awk '/proto kernel/ {print $1}' | grep -v / | tr -d '\n'"
+                destaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
+            if destaddr == "":
+                cmd = "ip -4 -br addr ls dev " + ifname + " | awk -F '[ /]+' '{print $3}' | tr -d '\n'"
+                destaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
             if destaddr != "":
                 #text += " " + str(i)
                 #cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
@@ -257,11 +263,20 @@ def draw_page():
 
     text = ""
     try:
-        cmd = "uci get openmptcprouter.omr.detected_ss_ipv4"
-        temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
-        text += str(temp)
+        cmd = "uci get openmptcprouter.vps.admin_error || true"
+        omrerr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore").replace("\n", "")
+        cmd = "uci get openmptcprouter.omr.detected_ss_ipv4 || true"
+        temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore").replace("\n", "")
+        if omrerr == "0" and temp != "":
+            text = str(temp)
+        elif omrerr == "0":
+            cmd = "uci get openmptcprouter.omr.detected_public_ipv4"
+            temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore").replace("\n", "")
+            text = str(temp)
+        else:
+            text = "Wating Server..."
     except:
-        text += "Wating Server..."
+        text = "Wating Server..."
     draw.text((0,49),text,font=font14,fill=255)
 
     #year=time.strftime('%Y')
