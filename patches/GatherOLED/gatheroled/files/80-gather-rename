@@ -1,0 +1,28 @@
+#!/bin/sh
+
+[ -n "${INTERFACE}" ] || exit
+[ -n "${DEVPATH}" ] || exit
+
+usbport=`echo $DEVPATH | sed 's/\/devices\/platform\/soc\/1c1d000.usb\/usb5\/5-1\///g' | awk -F'/' '{print $1}'`
+port=$((${usbport#5-1.}%5))
+if [ -w /sys/class/leds/gather\:leds\:usb$((port+1))/brightness ]; then
+	if [ $ACTION == 'add' ]; then
+		ifname=usb${port}
+		logger -t "Gather-Rename" "Rename ${INTERFACE} to ${ifname}"
+		existif=0
+		[ "$(ip link show ${ifname} 2>/dev/null)" != "" ] && {
+			ip link set ${ifname} down && ip link set ${ifname} name ${ifname}tmp 2>&1 >/dev/null
+			existif=1
+		}
+		ip link set ${INTERFACE} down && ip link set ${INTERFACE} name ${ifname} 2>&1 >/dev/null
+		ip link set ${ifname} up 2>&1 >/dev/null
+		[ "$existif" = "1" ] && ip link set ${ifname}tmp down && ip link set ${ifname}tmp name ${INTERFACE} 2>&1 >/dev/null
+		echo 255 > /sys/class/leds/gather\:leds\:usb$((port+1))/brightness
+		/etc/init.d/network reload
+	elif [ $ACTION == 'remove' ]; then
+		echo 0 > /sys/class/leds/gather\:leds\:usb$((port+1))/brightness
+	fi
+else
+	exit
+fi
+logger -t Gather-Rename "${ACTION} usbname:$usbport port:$port"

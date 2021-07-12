@@ -49,6 +49,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_BIN) ./files/gatheroled $(1)/etc/init.d/gatheroled
 	$(INSTALL_DIR) $(1)/usr/share/GatherOLED
 	$(CP) -r ./files/NanoHatOLED/* $(1)/usr/share/GatherOLED
+	$(INSTALL_DIR) $(1)/etc/hotplug.d/net
+	$(INSTALL_BIN) ./files/80-gather-rename $(1)/etc/hotplug.d/net/80-gather-rename
 endef
 
 define Package/$(PKG_NAME)/postinst
