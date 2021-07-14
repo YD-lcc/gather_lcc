@@ -137,7 +137,7 @@ def draw_logo():
     #draw.bitmap((0,48), server, fill=255)
 
 def draw_net(ifname, info):
-    net = '0' if ifname == 'eth1' else ('1' if ifname == 'usb0' else ('2' if ifname == 'usb1' else ('3' if ifname == 'usb2' else ('4' if ifname == 'usb3' else ('5' if ifname == 'usb4' else '')))))
+    net = '0' if ifname == 'eth1' else ('1' if ifname == 'gather0' else ('2' if ifname == 'gather1' else ('3' if ifname == 'gather2' else ('4' if ifname == 'gather3' else ('5' if ifname == 'gather4' else '')))))
     x_logo = int(net)*22
     y_logo = 0
     if net == "":
@@ -210,7 +210,7 @@ def draw_page():
                 temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 if temp == "huawei":
                     cmd = "(omr-huawei " + destaddr + " all || true) | awk -F';' '{print $1}'"
-                    temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
                     if temp != "":
                         draw_net(ifname, temp)
                         continue
@@ -219,7 +219,7 @@ def draw_page():
                     device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
                     if device != "":
                         cmd = "(omr-qmi " + device + " all || true) | awk -F';' '{print $1}'"
-                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
                         if temp != "":
                             draw_net(ifname, temp)
                             continue
@@ -228,7 +228,7 @@ def draw_page():
                     device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
                     if device != "":
                         cmd = "(omr-3g " + device + " || true) | tr -d '\n'"
-                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
                         if temp != "":
                             draw_net(ifname, temp)
                             continue
@@ -237,7 +237,7 @@ def draw_page():
                     device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
                     if device != "":
                         cmd = "(omr-modemmanager " + device + " all || true) | awk -F';' '{print $1}'"
-                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
                         if temp != "":
                             draw_net(ifname, temp)
                             continue

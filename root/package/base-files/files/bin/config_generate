@@ -616,12 +616,12 @@ if [ ! -s /etc/config/network ]; then
 		add_list dhcp.@dnsmasq[0].server='114.114.114.114'
 	EOF
 	
-	generate_gather_network 1 eth1 off
-	generate_gather_network 2 usb0 master
-	generate_gather_network 3 usb1 on
-	generate_gather_network 4 usb2 on
-	generate_gather_network 5 usb3 on
-	generate_gather_network 6 usb4 on
+	generate_gather_network 1 eth1 on
+	generate_gather_network 2 gather0 on
+	generate_gather_network 3 gather1 on
+	generate_gather_network 4 gather2 on
+	generate_gather_network 5 gather3 on
+	generate_gather_network 6 gather4 on
 fi
 
 if [ ! -s /etc/config/system ]; then
