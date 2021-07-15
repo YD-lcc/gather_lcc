@@ -206,8 +206,8 @@ def draw_page():
                 #cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
                 #temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 getsignal = False
-                cmd = "(uci get openmptcprouter.wan" + str(i) + ".manufacturer || uci get network.wan" + str(i) + ".proto || true) | tr -d '\n'"
-                temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                cmd = "(uci get openmptcprouter.wan" + str(i) + ".manufacturer || uci get network.usbwan" + str(i) + ".proto || uci get network.wan" + str(i) + ".proto || true) | tr -d '\n'"
+                temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
                 if temp == "huawei":
                     cmd = "(omr-huawei " + destaddr + " all || true) | awk -F';' '{print $1}'"
                     temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
@@ -241,6 +241,15 @@ def draw_page():
                         if temp != "":
                             draw_net(ifname, temp)
                             continue
+                elif temp == "ncm":
+                    cmd = "(uci get network.usbwan" + str(i) + ".device || true) | tr -d '\n'"
+                    device = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
+                    if device != "":
+                        cmd = "(omr-ncm " + device + " || true) | tr -d '\n'"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
+                        if temp != "":
+                            draw_net(ifname, temp)
+                            continue
                 cmd = "uci get openmptcprouter.wan" + str(i) + ".state | tr -d '\n'"
                 temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                 if temp == "up":
@@ -248,12 +257,17 @@ def draw_page():
                 elif temp == "down":
                     draw_net(ifname, "down")
                 else:
-                    cmd = "ping -w 1 -c 1 -I " + ifname + " " + destaddr + " | grep ' 0% packet loss' || true"
+                    cmd = "ping -w 1 -c 1 -I " + ifname + " 114.114.114.114 | grep ' 0% packet loss' || true"
                     temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
                     if temp != "":
                         draw_net(ifname, "up")
                     else:
-                        draw_net(ifname, "down")
+                        cmd = "ping -w 1 -c 1 -I " + ifname + " www.baidu.com | grep ' 0% packet loss' || true"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore")
+                        if temp != "":
+                            draw_net(ifname, "up")
+                        else:
+                            draw_net(ifname, "down")
         except:
             text = ""
     # text = time.strftime("%a %e %b %Y")

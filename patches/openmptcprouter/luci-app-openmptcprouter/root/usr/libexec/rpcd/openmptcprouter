@@ -1100,6 +1100,9 @@ function interfaces_status()
 		    if uci:get("openmptcprouter", "settings", "disablegwping") ~= "1" and connectivity ~= "ERROR" then
 			    local gw_ping_test = ut.trim(sys.exec("ping -w 1 -c 1 " .. gateway .. " | grep '100% packet loss'"))
 			    if gw_ping_test ~= "" then
+				    gw_ping_test = ut.trim(sys.exec("ping -w 1 -c 1 -I " .. ifname .. " 114.114.114.114 | grep '100% packet loss'"))
+			    end
+			    if gw_ping_test ~= "" then
 				    gw_ping = "DOWN"
 				    if connectivity == "OK" then
 					    connectivity = "WARNING"

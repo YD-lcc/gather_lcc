@@ -51,6 +51,10 @@ define Package/$(PKG_NAME)/install
 	$(CP) -r ./files/NanoHatOLED/* $(1)/usr/share/GatherOLED
 	$(INSTALL_DIR) $(1)/etc/hotplug.d/net
 	$(INSTALL_BIN) ./files/80-gather-rename $(1)/etc/hotplug.d/net/80-gather-rename
+	$(INSTALL_DIR) $(1)/lib/preinit
+	$(INSTALL_BIN) ./files/01_boot_oled $(1)/lib/preinit/01_boot_oled
+	$(INSTALL_DIR) $(1)/bin
+	$(INSTALL_BIN) ./files/omr-ncm $(1)/bin/omr-ncm
 endef
 
 define Package/$(PKG_NAME)/postinst

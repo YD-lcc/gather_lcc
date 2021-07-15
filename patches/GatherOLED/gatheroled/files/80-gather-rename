@@ -1,28 +1,58 @@
 #!/bin/sh
 
+logger -t "Gather-Rename" $(env)
 [ -n "${INTERFACE}" ] || exit
 [ -n "${DEVPATH}" ] || exit
 
 usbport=`echo $DEVPATH | sed 's/\/devices\/platform\/soc\/1c1d000.usb\/usb5\/5-1\///g' | awk -F'/' '{print $1}'`
 port=$((${usbport#5-1.}%5))
+vid=$(cat /sys/$(echo $DEVPATH | awk -F: '{print $1}' | sed "s/${usbport}\///")/idVendor)
+pid=$(cat /sys/$(echo $DEVPATH | awk -F: '{print $1}' | sed "s/${usbport}\///")/idProduct)
 if [ -w /sys/class/leds/gather\:leds\:usb$((port+1))/brightness ]; then
 	if [ $ACTION == 'add' ]; then
 		echo 255 > /sys/class/leds/gather\:leds\:usb$((port+1))/brightness
 		ifname=gather${port}
-		logger -t "Gather-Rename" "Rename ${INTERFACE} to ${ifname}"
+		uciwan=$(uci show network | grep ${ifname} | awk -F. '{print $2}')
+		logger -t "Gather-Rename" "Rename ${INTERFACE} to ${ifname} $uciwan"
+		if [ $vid == '12d1' -a $pid == '15c1' -a $uciwan != "" ]; then
+			mtty=$(readlink -f /sys/$(echo $DEVPATH | awk -F: '{print $1}'):2.2/ttyUSB*)
+			mtty=${mtty##*/}
+			uci set network.usb${uciwan}=interface
+			uci set network.usb${uciwan}.proto='ncm'
+			uci set network.usb${uciwan}.multipath='off'
+			uci set network.usb${uciwan}.addlatency='0'
+			uci set network.usb${uciwan}.device="/dev/${mtty}"
+			uci set network.usb${uciwan}.pdptype='IP'
+			uci set network.usb${uciwan}.ipv6='auto'
+			uci set network.usb${uciwan}.apn=''
+			uci commit network
+			sleep 1
+			ubus call network.interface.usb${uciwan} down
+			sleep 2
+			ubus call network.interface.usb${uciwan} up
+		fi
+		uci commit network
 		#existif=0
 		[ "$(ip link show ${ifname} 2>/dev/null)" != "" ] && {
 			ip link set ${ifname} down && ip link set ${ifname} name ${ifname}tmp 2>&1 >/dev/null
-			#existif=1
+		#	existif=1
 		}
 		ip link set ${INTERFACE} down && ip link set ${INTERFACE} name ${ifname} 2>&1 >/dev/null
 		ip link set ${ifname} up 2>&1 >/dev/null
-		## [ "$existif" = "1" ] && ip link set ${ifname}tmp down && ip link set ${ifname}tmp name ${INTERFACE} 2>&1 >/dev/null
+		#[ "$existif" = "1" ] && ip link set ${ifname}tmp down && ip link set ${ifname}tmp name ${INTERFACE} 2>&1 >/dev/null
 		/etc/init.d/network reload
 	elif [ $ACTION == 'remove' ]; then
 		echo 0 > /sys/class/leds/gather\:leds\:usb$((port+1))/brightness
+		ifname=gather${port}
+		uciwan=$(uci show network | grep ${ifname} | awk -F. '{print $2}')
+		if [ $uciwan != "" -a $(uci get network.usb${uciwan}.proto) == "ncm" ]; then
+			ubus call network.interface.usb${uciwan} down
+			uci del network.usb${uciwan}
+			uci commit network
+			/etc/init.d/network reload
+		fi 
 	fi
 else
 	exit
 fi
-logger -t Gather-Rename "${ACTION} usbname:$usbport port:$port"
+logger -t "Gather-Rename" "${ACTION} usbname:$usbport port:$port $vid $pid"

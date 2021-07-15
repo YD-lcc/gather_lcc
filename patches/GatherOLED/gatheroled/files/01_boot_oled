@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cd /usr/share/GatherOLED && /usr/bin/python3 /usr/share/GatherOLED/boot_oled.py >> /tmp/boot-oled.log 2>&1 &
