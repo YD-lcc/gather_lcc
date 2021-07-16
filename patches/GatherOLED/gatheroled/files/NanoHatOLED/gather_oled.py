@@ -86,7 +86,7 @@ t.setDaemon(True)
 t.start()
 
 def get_batt():
-    global batper, battlast
+    global batper, battlast, batthight
     batper = 0
     batmove = 0
     while True:
@@ -96,9 +96,11 @@ def get_batt():
                 cmd = "cat /sys/bus/iio/devices/iio\:device0/in_voltage0-voltage1_raw"
                 voltage += int(subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore"))
             if int(voltage / 10) < 3000:
-                battlast = 2400
+                battlast = 2420
+                batthight = 480
             else:
                 battlast = 27000
+                batthight = 680
             batcalc = batthight - battlow
             if (batper > 0 and batper < 10):
                 batcalc = battlow * 10

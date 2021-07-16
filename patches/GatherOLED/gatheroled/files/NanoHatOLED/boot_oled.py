@@ -20,7 +20,7 @@ height=64
 oled.init()  #initialze SEEED OLED display
 oled.setNormalDisplay()      #Set display to normal mode (i.e non-inverse mode)
 oled.setHorizontalMode()
-#oled.setVerticalMode()
+# oled.setVerticalMode()
 
 global image
 image = Image.new('1', (width, height))
@@ -37,6 +37,6 @@ fontb14 = ImageFont.truetype('DejaVuSansMono-Bold.ttf', 14);
 global font11
 font11 = ImageFont.truetype('DejaVuSansMono.ttf', 11);
 
-oled.clearDisplay()
+# oled.clearDisplay()
 image0 = Image.open('logo.png').convert('1')
 oled.drawImage(image0)
