@@ -95,7 +95,7 @@ def get_batt():
             for i in range(10):
                 cmd = "cat /sys/bus/iio/devices/iio\:device0/in_voltage0-voltage1_raw"
                 voltage += int(subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore"))
-            if int(voltage / 10) < 3000:
+            if int(voltage / 10) < 20000:
                 battlast = 2420
                 batthight = 480
             else:
