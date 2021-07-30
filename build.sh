@@ -324,6 +324,14 @@ if ! patch -Rf -N -p1 -s --dry-run < ../../patches/rtl8812au-ac-update-wireless-
 fi
 echo "Done"
 
+# add rtl8821cu.patch
+echo "Checking if rtl8821cu patch is set or not"
+if ! patch -Rf -N -p1 -s --dry-run < ../../patches/rtl8821cu.patch; then
+	echo "apply..."
+	patch -N -p1 -s < ../../patches/rtl8821cu.patch
+fi
+echo "Done"
+
 # add nanopi neo core supported
 for i in `ls ../../patches/linux`; do [ ! -e target/linux/sunxi/patches-5.4/$i ] && cp ../../patches/linux/$i target/linux/sunxi/patches-5.4/$i; done
 for i in `ls ../../patches/uboot`; do [ ! -e package/boot/uboot-sunxi/patches/$i ] && cp ../../patches/uboot/$i package/boot/uboot-sunxi/patches/$i; done

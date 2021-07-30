@@ -1,0 +1,279 @@
+From 0ab75d769c093bdaa3770bb0b65eeb523200f303 Mon Sep 17 00:00:00 2001
+From: hejiawencc <hjw0415@outlook.com>
+Date: Sat, 27 Mar 2021 13:56:25 +0800
+Subject: [PATCH] =?UTF-8?q?=E6=B7=BB=E5=8A=A0rtl8821cu=E9=A9=B1=E5=8A=A8?=
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+---
+ package/kernel/rtl8821cu/Makefile             | 86 +++++++++++++++++++
+ .../patches/001-use-kernel-byteorder.patch    | 15 ++++
+ .../patches/010-remove-extra-cflags.patch     | 11 +++
+ .../patches/020-remove-repeat-flies.patch     | 39 +++++++++
+ .../030-change-value-of-vht-enable.patch      | 11 +++
+ .../rtl8821cu/patches/040-wireless-5.8.patch  | 58 +++++++++++++
+ 6 files changed, 221 insertions(+), 1 deletion(-)
+ create mode 100644 package/kernel/rtl8821cu/Makefile
+ create mode 100644 package/kernel/rtl8821cu/patches/001-use-kernel-byteorder.patch
+ create mode 100644 package/kernel/rtl8821cu/patches/010-remove-extra-cflags.patch
+ create mode 100644 package/kernel/rtl8821cu/patches/020-remove-repeat-flies.patch
+ create mode 100644 package/kernel/rtl8821cu/patches/030-change-value-of-vht-enable.patch
+ create mode 100644 package/kernel/rtl8821cu/patches/040-wireless-5.8.patch
+
+diff --git a/package/kernel/rtl8821cu/Makefile b/package/kernel/rtl8821cu/Makefile
+new file mode 100644
+index 0000000000..052efad813
+--- /dev/null
++++ b/package/kernel/rtl8821cu/Makefile
+@@ -0,0 +1,86 @@
++#
++# Copyright (C) 2021 ImmortalWrt
++# <https://immortalwrt.org>
++#
++# This is free software, licensed under the GNU General Public License v3.
++# See /LICENSE for more information.
++#
++
++include $(TOPDIR)/rules.mk
++
++PKG_NAME:=rtl8821cu
++PKG_RELEASE:=1
++
++PKG_SOURCE_URL:=https://github.com/brektrou/rtl8821CU.git
++PKG_SOURCE_PROTO:=git
++PKG_SOURCE_DATE:=2020-12-19
++PKG_SOURCE_VERSION:=428a0820487418ec69c0edb91726d1cf19763b1e
++PKG_MIRROR_HASH:=77958d3bff8b0145504a10959765be0e3743b9c4880a5173d156238c2c569a56
++
++PKG_LICENSE:=GPL-2.0
++PKG_LICENSE_FILES:=LICENSE
++PKG_MAINTAINTER:=CN_SZTL <cnsztl@immortalwrt.org>
++
++PKG_BUILD_PARALLEL:=1
++
++STAMP_CONFIGURED_DEPENDS := $(STAGING_DIR)/usr/include/mac80211-backport/backport/autoconf.h
++
++include $(INCLUDE_DIR)/kernel.mk
++include $(INCLUDE_DIR)/package.mk
++
++define KernelPackage/rtl8821cu
++  SUBMENU:=Wireless Drivers
++  TITLE:=Realtek RTL8811CU/RTL8821CU support
++  DEPENDS:=+kmod-cfg80211 +kmod-usb-core +@DRIVER_11N_SUPPORT +@DRIVER_11AC_SUPPORT
++  FILES:=$(PKG_BUILD_DIR)/rtl8821cu.ko
++  AUTOLOAD:=$(call AutoProbe,rtl8821cu)
++  PROVIDES:=kmod-rtl8821cu
++endef
++
++NOSTDINC_FLAGS = \
++	-I$(PKG_BUILD_DIR) \
++	-I$(PKG_BUILD_DIR)/include \
++	-I$(STAGING_DIR)/usr/include/mac80211-backport \
++	-I$(STAGING_DIR)/usr/include/mac80211-backport/uapi \
++	-I$(STAGING_DIR)/usr/include/mac80211 \
++	-I$(STAGING_DIR)/usr/include/mac80211/uapi \
++	-include backport/autoconf.h \
++	-include backport/backport.h
++
++EXTRA_KCONFIG:= \
++	CONFIG_RTL8821CU=m \
++	USER_MODULE_NAME=rtl8821cu
++
++ifeq ($(ARCH),aarch64)
++	EXTRA_KCONFIG += CONFIG_MP_VHT_HW_TX_MODE=n
++endif
++
++EXTRA_CFLAGS:= \
++	-DRTW_SINGLE_WIPHY \
++	-DRTW_USE_CFG80211_STA_EVENT \
++	-DCONFIG_IOCTL_CFG80211 \
++	-DCONFIG_CONCURRENT_MODE \
++	-DBUILD_OPENWRT
++
++ifeq ($(ARCH),arm)
++	EXTRA_CFLAGS += -mfloat-abi=softfp
++endif
++
++ifeq ($(BOARD),x86)
++	EXTRA_CFLAGS += -mhard-float
++endif
++
++MAKE_OPTS:= \
++	$(KERNEL_MAKE_FLAGS) \
++	M="$(PKG_BUILD_DIR)" \
++	NOSTDINC_FLAGS="$(NOSTDINC_FLAGS)" \
++	USER_EXTRA_CFLAGS="$(EXTRA_CFLAGS)" \
++	$(EXTRA_KCONFIG)
++
++define Build/Compile
++	+$(MAKE) $(PKG_JOBS) -C "$(LINUX_DIR)" \
++		$(MAKE_OPTS) \
++		modules
++endef
++
++$(eval $(call KernelPackage,rtl8821cu))
+diff --git a/package/kernel/rtl8821cu/patches/001-use-kernel-byteorder.patch b/package/kernel/rtl8821cu/patches/001-use-kernel-byteorder.patch
+new file mode 100644
+index 0000000000..e75a278339
+--- /dev/null
++++ b/package/kernel/rtl8821cu/patches/001-use-kernel-byteorder.patch
+@@ -0,0 +1,15 @@
++Fix compile problem when rtw_byteorder.h and asm/byteorder.h gets 
++included in addition for example indirectly, do not use realtek own copy 
++of the byteorder headers.
++
++--- a/include/drv_types.h
+++++ b/include/drv_types.h
++@@ -25,7 +25,7 @@
++ #include <drv_conf.h>
++ #include <basic_types.h>
++ #include <osdep_service.h>
++-#include <rtw_byteorder.h>
+++#include <asm/byteorder.h>
++ #include <wlan_bssdef.h>
++ #include <wifi.h>
++ #include <ieee80211.h>
+diff --git a/package/kernel/rtl8821cu/patches/010-remove-extra-cflags.patch b/package/kernel/rtl8821cu/patches/010-remove-extra-cflags.patch
+new file mode 100644
+index 0000000000..bc753af413
+--- /dev/null
++++ b/package/kernel/rtl8821cu/patches/010-remove-extra-cflags.patch
+@@ -0,0 +1,11 @@
++--- a/Makefile
+++++ b/Makefile
++@@ -2103,8 +2103,6 @@ ifeq ($(ARCH), i386)
++ EXTRA_CFLAGS += -mhard-float
++ else ifeq ($(ARCH), x86_64)
++ EXTRA_CFLAGS += -mhard-float
++-else ifeq ($(ARCH), arm)
++-EXTRA_CFLAGS += -mfloat-abi=hard
++ endif
++ 
++ ifeq ($(CONFIG_MULTIDRV), y)
+diff --git a/package/kernel/rtl8821cu/patches/020-remove-repeat-flies.patch b/package/kernel/rtl8821cu/patches/020-remove-repeat-flies.patch
+new file mode 100644
+index 0000000000..76baf2a24a
+--- /dev/null
++++ b/package/kernel/rtl8821cu/patches/020-remove-repeat-flies.patch
+@@ -0,0 +1,39 @@
++From 9b2b0ec1bc2d31ddf93ed74d63fdfa6044e329a4 Mon Sep 17 00:00:00 2001
++From: Ben Greear <greearb@candelatech.com>
++Date: Fri, 9 Nov 2018 16:21:43 -0800
++Subject: [PATCH] Fix build against openwrt backports tree.
++
++Like breaks builds elsewhere, can fix it up later.
++
++Signed-off-by: Ben Greear <greearb@candelatech.com>
++---
++ include/drv_conf.h                            |  4 +++-
++ .../{wireless.h => old_unused_rtl_wireless.h} |  0
++ include/{autoconf.h => rtl_autoconf.h}        |  0
++ 3 files changed, 3 insertions(+), 1 deletions(-)
++ rename include/linux/{wireless.h => old_unused_rtl_wireless.h} (100%)
++ rename include/{autoconf.h => rtl_autoconf.h} (100%)
++
++diff --git a/include/drv_conf.h b/include/drv_conf.h
++index 0d20a7e..f0a9f88 100644
++--- a/include/drv_conf.h
+++++ b/include/drv_conf.h
++@@ -14,7 +14,9 @@
++  *****************************************************************************/
++ #ifndef __DRV_CONF_H__
++ #define __DRV_CONF_H__
++-#include "autoconf.h"
+++
+++#include <generated/autoconf.h>
+++#include "rtl_autoconf.h"
++ #include "hal_ic_cfg.h"
++ 
++ #if defined(PLATFORM_LINUX) && defined (PLATFORM_WINDOWS)
++diff --git a/include/linux/wireless.h b/include/linux/old_unused_rtl_wireless.h
++similarity index 100%
++rename from include/linux/wireless.h
++rename to include/linux/old_unused_rtl_wireless.h
++diff --git a/include/autoconf.h b/include/rtl_autoconf.h
++similarity index 100%
++rename from include/autoconf.h
++rename to include/rtl_autoconf.h
+diff --git a/package/kernel/rtl8821cu/patches/030-change-value-of-vht-enable.patch b/package/kernel/rtl8821cu/patches/030-change-value-of-vht-enable.patch
+new file mode 100644
+index 0000000000..34dcd8e4de
+--- /dev/null
++++ b/package/kernel/rtl8821cu/patches/030-change-value-of-vht-enable.patch
+@@ -0,0 +1,11 @@
++--- a/os_dep/linux/os_intfs.c
+++++ b/os_dep/linux/os_intfs.c
++@@ -238,7 +238,7 @@
++ #endif /* CONFIG_80211N_HT */
++ 
++ #ifdef CONFIG_80211AC_VHT
++-int rtw_vht_enable = 1; /* 0:disable, 1:enable, 2:force auto enable */
+++int rtw_vht_enable = 2; /* 0:disable, 1:enable, 2:force auto enable */
++ module_param(rtw_vht_enable, int, 0644);
++ 
++ int rtw_ampdu_factor = 7;
+diff --git a/package/kernel/rtl8821cu/patches/040-wireless-5.8.patch b/package/kernel/rtl8821cu/patches/040-wireless-5.8.patch
+new file mode 100644
+index 0000000000..2453c61ff0
+--- /dev/null
++++ b/package/kernel/rtl8821cu/patches/040-wireless-5.8.patch
+@@ -0,0 +1,58 @@
++diff --git a/os_dep/linux/ioctl_cfg80211.c b/os_dep/linux/ioctl_cfg80211.c
++index d9c81c9..3e7e27a 100755
++--- a/os_dep/linux/ioctl_cfg80211.c
+++++ b/os_dep/linux/ioctl_cfg80211.c
++@@ -7149,7 +7149,7 @@ static void cfg80211_rtw_mgmt_frame_register(struct wiphy *wiphy,
++ #else
++ 	struct net_device *ndev,
++ #endif
++-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0))
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0)) || defined(BUILD_OPENWRT)
++ 	struct mgmt_frame_regs *upd)
++ #else
++ 	u16 frame_type, bool reg)
++@@ -7178,7 +7178,7 @@ static void cfg80211_rtw_mgmt_frame_register(struct wiphy *wiphy,
++ 	/* Wait QC Verify */
++ 	return;
++ 
++-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0))
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0)) || defined(BUILD_OPENWRT)
++ 	SET_CFG80211_REPORT_MGMT(pwdev_priv, IEEE80211_STYPE_PROBE_REQ, upd->interface_stypes & BIT(IEEE80211_STYPE_PROBE_REQ >> 4));
++ #else
++ 	switch (frame_type) {
++@@ -9467,7 +9467,7 @@ static struct cfg80211_ops rtw_cfg80211_ops = {
++ 
++ #if (LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)) || defined(COMPAT_KERNEL_RELEASE)
++ 	.mgmt_tx = cfg80211_rtw_mgmt_tx,
++-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0))
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(5,8,0)) || defined(BUILD_OPENWRT)
++ 	.update_mgmt_frame_registrations = cfg80211_rtw_mgmt_frame_register,
++ #else
++ 	.mgmt_frame_register = cfg80211_rtw_mgmt_frame_register,
++diff --git a/os_dep/linux/os_intfs.c b/os_dep/linux/os_intfs.c
++index 257c581..f97fa24 100755
++--- a/os_dep/linux/os_intfs.c
+++++ b/os_dep/linux/os_intfs.c
++@@ -1302,6 +1302,14 @@ unsigned int rtw_classify8021d(struct sk_buff *skb)
++ }
++ 
++ 
+++#if (LINUX_VERSION_CODE >= KERNEL_VERSION(4,19,0))
+++static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb
+++    , struct net_device *sb_dev
+++    #if (LINUX_VERSION_CODE < KERNEL_VERSION(5,2,0))
+++    , select_queue_fallback_t fallback
+++    #endif
+++)
+++#else
++ static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb
++ #if LINUX_VERSION_CODE >= KERNEL_VERSION(3, 13, 0)
++ 	, void *accel_priv
++@@ -1310,6 +1318,7 @@ static u16 rtw_select_queue(struct net_device *dev, struct sk_buff *skb
++ 	#endif
++ #endif
++ )
+++#endif
++ {
++ 	_adapter	*padapter = rtw_netdev_priv(dev);
++ 	struct mlme_priv *pmlmepriv = &padapter->mlmepriv;
