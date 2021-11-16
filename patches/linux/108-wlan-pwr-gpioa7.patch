@@ -1,0 +1,20 @@
+diff -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-11-16 21:20:03.750002065 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-11-16 21:31:23.486707463 +0800
+@@ -58,6 +58,16 @@
+ 				gpios = <&pio 0 12 GPIO_ACTIVE_LOW>;
+ 		};
+ 	};
++
++	wlan_pwr: wlan-pwr {
++		compatible = "regulator-fixed";
++		gpio = <&pio 0 7 GPIO_ACTIVE_HIGH>;
++		regulator-name = "wlan-pwr";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-enable-ramp-delay = <1000>;
++		enable-active-high;
++	};
+ 	
+ 	leds {
+ 		wifi-leds {
