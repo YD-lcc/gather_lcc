@@ -8,7 +8,7 @@ diff -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i
 +
 +		wlan-pwr {
 +			label = "wlan-pwr";
-+			gpios = <0x09 0x00 0x07 0x00>;
++			gpios = <&pio 0 7 GPIO_ACTIVE_HIGH>;
 +			default-state = "on";
 +		};
  	};
