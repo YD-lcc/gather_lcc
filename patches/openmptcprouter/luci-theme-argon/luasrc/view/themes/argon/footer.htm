@@ -20,10 +20,10 @@
 </div>
 <footer class="mobile-hide">
 	<div>
-		<a class="luci-link" >GATHER NANO V1.3 技术支持QQ群号: 885724035 firmware support openmtpcprouter</a> /
+		<a>ID: <%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%>, </a>
+		<a class="luci-link" >GATHER NANO V1.3 firmware support openmtpcprouter</a> /
 						<a href="https://github.com/jerrykuku/luci-theme-argon">ArgonTheme <%# vPKG_VERSION %></a> /
 						<%= ver.distversion %>
-		<a><%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%></a>
 		<ul class="breadcrumb pull-right" id="modemenu" style="display:none"></ul>
 	</div>
 </footer>

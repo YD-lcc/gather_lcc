@@ -8,8 +8,8 @@
 <% local ver = require "luci.version" %>
 
    <footer>
-    <a>GATHER NANO V1.3 技术支持QQ群号: 885724035 firmware support openmtpcprouter</a>
-    <a><%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%></a>
+    <a>ID: <%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%>, </a>
+    <a>GATHER NANO V1.3 firmware support openmtpcprouter</a>
     <ul class="breadcrumb pull-right" id="modemenu" style="display:none"></ul>
    </footer>
   </div>
