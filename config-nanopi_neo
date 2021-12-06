@@ -73,8 +73,8 @@ CONFIG_PACKAGE_rtl8188eu-firmware=m
 CONFIG_PACKAGE_kmod-rtl8812au-ac=y
 # CONFIG_PACKAGE_kmod-rtl8812au-ct is not set
 CONFIG_VERSION_DIST="firmware support openmtpcprouter"
-CONFIG_VERSION_NUMBER="V1.0"
-CONFIG_VERSION_CODE="0"
+CONFIG_VERSION_NUMBER="V1.3"
+CONFIG_VERSION_CODE="1"
 
 # CONFIG_PACKAGE_mt76-test is not set
 CONFIG_PACKAGE_mt7601u-firmware=y

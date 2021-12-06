@@ -129,7 +129,7 @@ if [ "$(uci -q get openmptcprouter.vps.ip)" = "" ] && [ "$(uci -q get openmptcpr
 	pass="$(cat /mnt/.bash_histry | sed -n '3p')"
 	umount /mnt
 	if [ -z ${ipaddr} ] || [ -z ${username} ] || [ -z ${pass} ] || [ ${ipaddr} = "" ] || [ ${username} = "" ] || [ ${pass} = "" ]; then
-		ipaddr='gather.gathervip.com'
+		ipaddr='121.199.42.167'
 		username='openmptcprouter'
 		pass='38611A8B57E9A61FC20240DE560EDC9923D7D7C6EC0B2EA093D84DC368A91CB8'
 	fi
