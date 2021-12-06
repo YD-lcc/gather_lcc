@@ -5,7 +5,10 @@
  Licensed to the public under the Apache License 2.0.
 -%>
 
-<% local ver = require "luci.version" %>
+<%
+  local ver = require "luci.version"
+  local sys   = require "luci.sys"
+%>
 
    <footer>
     <a>ID: <%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%>, </a>
