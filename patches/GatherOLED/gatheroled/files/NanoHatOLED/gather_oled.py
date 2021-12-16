@@ -290,9 +290,9 @@ def draw_page():
             temp = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore").replace("\n", "")
             text = str(temp)
         else:
-            text = "Wating Server..."
+            text = "Waiting Server..."
     except:
-        text = "Wating Server..."
+        text = "Waiting Server..."
     draw.text((0,49),text,font=font14,fill=255)
 
     #year=time.strftime('%Y')

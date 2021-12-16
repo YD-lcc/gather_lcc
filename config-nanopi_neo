@@ -107,3 +107,4 @@ CONFIG_PACKAGE_kmod-rt73-usb=y
 CONFIG_PACKAGE_hostapd-common=y
 
 CONFIG_PACKAGE_gatheroled=y
+CONFIG_PACKAGE_ppp-mod-pptp=y
