@@ -128,6 +128,7 @@
     function upgrade_checka() {
         var current_version = data.release.version.toLowerCase();
         var current_branch = current_version.split('.').slice(0, 2).join('.')
+        var current_version_code = current_version.split('.').slice(1, 5).join('.')
         var candidates = []
         hide("#status_box");
         hide("#server_div");
@@ -141,8 +142,8 @@
         data["md5"] = "<%=updateinfo[3]%>"
         
         version = "<%=updateinfo[2]%>"
-        
-        if (version.length > 0 && version != data.release.version) {
+        var least_version_code = version.split('.').slice(1, 5).join('.')
+        if (version.length > 0 && version != data.release.version && least_version_code > current_version_code) {
             var info_output = "<h3>New release <b>" + version + "</b> available</h3>"
             info_output += _('Installed version:') + " " + data.release.version
 
@@ -193,5 +194,6 @@
             set_status("danger", "Device not sysupgrade compatible!")
         }
     }
+    document.onload = setup()
 </script>
 <%+footer%>

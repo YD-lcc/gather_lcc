@@ -1,5 +1,5 @@
 #!/bin/sh
-linklist="https://bond-fhhfdsfhsioferu.oss-cn-beijing.aliyuncs.com/gather"
+linklist="https://bond-fhhfdsfhsioferu.oss-cn-beijing.aliyuncs.com/bond"
 
 getupdate() {
 	for i in $linklist; do
