@@ -1,0 +1,80 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2020-05-23 15:41+0000\n"
+"Last-Translator: Google translator\n"
+"luciapplicationsuser/el/>\n"
+"Language: el\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.1-dev\n"
+
+#: applications/luci-app-user/root/usr/share/luci/menu.d/luci-app-user.json:3
+msgid "User Password"
+msgstr "Κωδικός Χρήστη"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:267
+msgid "Cannot encrypt plaintext password since uhttpd is not installed."
+msgstr ""
+"Δεν είναι δυνατή η κρυπτογράφηση του κωδικού πρόσβασης απλού κειμένου, "
+"επειδή δεν είναι εγκατεστημένο το uhttpd."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:79
+msgid "Description"
+msgstr "Περιγραφή"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:212
+msgid "Login name"
+msgstr "Όνομα σύνδεσης"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:202
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "LuCI Logins"
+msgstr "Συνδέσεις LuCI"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "New account"
+msgstr "Νέος λογαριασμός"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:244
+msgid "Password value"
+msgstr "Κωδικός"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:215
+msgid "Password variant"
+msgstr "Παραλλαγή κωδικού"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:289
+msgid "Session timeout"
+msgstr "Λήξη σύνδεσης"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:259
+msgid "The password may not start with \"$p$\"."
+msgstr "Ο κωδικός πρόσβασης δεν πρέπει να ξεκινά με \"$p$\"."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "The system account to use the password from"
+msgstr "Ο λογαριασμός συστήματος με χρήση του κωδικού από"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "UNIX account"
+msgstr "Λογαριασμός UNIX"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:282
+msgid "Unable to encrypt plaintext password: %s"
+msgstr ""
+"Δεν είναι δυνατή η κρυπτογράφηση του κωδικού πρόσβασης απλού κειμένου: %s"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:217
+msgid "Use UNIX password in /etc/shadow"
+msgstr "Χρήση κωδικού πρόσβασης UNIX στο /etc/shadow"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:218
+msgid "Use encrypted password hash"
+msgstr "Χρήση κρυπτογραφημένου κωδικού"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:219
+msgid "Use plain password"
+msgstr "Χρήση απλού κωδικού πρόσβασης"

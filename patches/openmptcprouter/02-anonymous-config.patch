@@ -1,0 +1,12 @@
+diff --git a/luci-app-openmptcprouter/root/bin/anonymous_config.sh b/luci-app-openmptcprouter/root/bin/anonymous_config.sh
+index 674d0172..fe303c01 100755
+--- a/luci-app-openmptcprouter/root/bin/anonymous_config.sh
++++ b/luci-app-openmptcprouter/root/bin/anonymous_config.sh
+@@ -22,4 +22,5 @@ uci show | \
+ 	-e "/vps\.key=/s/......$/xxxxxx'/" \
+ 	-e "/wgkey=/s/......$/xxxxxx'/" \
+ 	-e "/ula_prefix=2/s/=.........../='xxxxxxxxxxx/" \
+-	-e "/token=/s/............$/xxxxxx'/"
+\ No newline at end of file
++	-e "/token=/s/............$/xxxxxx'/" \
++	-e "/rpcd/s/.*//"

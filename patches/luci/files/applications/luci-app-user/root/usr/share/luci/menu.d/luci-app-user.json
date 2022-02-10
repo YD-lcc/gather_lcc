@@ -1,0 +1,14 @@
+{
+	"admin/system/user": {
+		"title": "User Password",
+		"order": 10,
+		"action": {
+			"type": "view",
+			"path": "system/user"
+		},
+		"depends": {
+			"acl": [ "luci-app-user" ],
+			"uci": { "rpcd": true }
+		}
+	}
+}

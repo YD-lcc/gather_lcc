@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2020-04-20 07:11+0000\n"
+"Last-Translator: Google translator\n"
+"luciapplicationsuser/de/>\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: Weblate 4.0.2-dev\n"
+
+#: applications/luci-app-user/root/usr/share/luci/menu.d/luci-app-user.json:3
+msgid "User Password"
+msgstr "Benutzer-Passwort"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:267
+msgid "Cannot encrypt plaintext password since uhttpd is not installed."
+msgstr ""
+"Klartextpassword konnte nicht verschlüsselt werden, da uhttpd nicht "
+"installiert ist."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:79
+msgid "Description"
+msgstr "Beschreibung"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:212
+msgid "Login name"
+msgstr "Loginname"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:202
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "LuCI Logins"
+msgstr "LuCI-Logins"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "New account"
+msgstr "Neues Konto"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:244
+msgid "Password value"
+msgstr "Passwort"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:215
+msgid "Password variant"
+msgstr "Passwort-Variante"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:289
+msgid "Session timeout"
+msgstr "Timeout der Sitzung"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:259
+msgid "The password may not start with \"$p$\"."
+msgstr "Das Passwort darf nicht mit \"$p$\" beginnen."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "The system account to use the password from"
+msgstr "Das Systemkonto, dessen Passwort genutzt wird"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "UNIX account"
+msgstr "UNIX-Konto"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:282
+msgid "Unable to encrypt plaintext password: %s"
+msgstr "Konnte Klartextpasswort nicht verschlüsseln: %s"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:217
+msgid "Use UNIX password in /etc/shadow"
+msgstr "Verwende das UNIX-Passwort in /etc/shadow"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:218
+msgid "Use encrypted password hash"
+msgstr "Verwende einen verschlüsselten Passwort-Hash"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:219
+msgid "Use plain password"
+msgstr "Verwende Klartextpasswörter"

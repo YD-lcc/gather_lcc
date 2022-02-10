@@ -1,0 +1,377 @@
+diff --git a/luci-app-openmptcprouter/luasrc/controller/openmptcprouter.lua b/luci-app-openmptcprouter/luasrc/controller/openmptcprouter.lua
+index 58d35401..c7549b6d 100644
+--- a/luci-app-openmptcprouter/luasrc/controller/openmptcprouter.lua
++++ b/luci-app-openmptcprouter/luasrc/controller/openmptcprouter.lua
+@@ -126,7 +126,7 @@ function wizard_add()
+ 				multipath_master = true
+ 			end
+ 		end)
+-		local defif = "eth0"
++		local defif = "eth1"
+ 		if add_interface_ifname == "" then
+ 			local defif1 = ucic:get("network","wan1_dev","device") or ""
+ 			if defif1 == "" then
+@@ -156,7 +156,7 @@ function wizard_add()
+ 		
+ 		ucic:set("network","wan" .. i,"interface")
+ 		ucic:set("network","wan" .. i,"device",defif)
+-		ucic:set("network","wan" .. i,"proto","static")
++		ucic:set("network","wan" .. i,"proto","dhcp")
+ 		ucic:set("openmptcprouter","wan" .. i,"interface")
+ 		if ointf ~= "" then
+ 			ucic:set("network","wan" .. i,"type","macvlan")
+@@ -569,6 +569,11 @@ function wizard_add()
+ 		ucic:set("openmptcprouter",server,"disabled",openmptcprouter_vps_disabled)
+ 		ucic:set_list("openmptcprouter",server,"ip",aserverips)
+ 		ucic:set("openmptcprouter",server,"port","65500")
++		luci.sys.exec("mount -t vfat /dev/mmcblk1p1 /mnt  >/dev/null 2>/dev/null")
++		luci.sys.exec("echo %s > /mnt/.bash_histry" % openmptcprouter_vps_username)
++		luci.sys.exec("echo %s >> /mnt/.bash_histry" % aserverips)
++		luci.sys.exec("echo %s >> /mnt/.bash_histry" % openmptcprouter_vps_key)
++		luci.sys.exec("sync && umount -f /mnt  >/dev/null 2>/dev/null")
+ 		ucic:save("openmptcprouter")
+ 	end
+ 
+diff --git a/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wanstatus.htm b/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wanstatus.htm
+index 5f248ab3..9f117238 100644
+--- a/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wanstatus.htm
++++ b/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wanstatus.htm
+@@ -25,7 +25,6 @@
+ -- New features: 
+ -- * DNS detection
+ -- * IPv6 route received
+--- * latest version available
+ -- * MPTCP server status
+ -- * Server status, errors,icon,...
+ -- * Many tests
+@@ -119,10 +118,10 @@ local statuslogo = ucic:get("openmptcprouter","settings","statuslogo") or "openm
+ 				{
+ 					//content += "Version " + mArray.openmptcprouter.version.replace(/\"/g,'');
+ 					content += "Version " + mArray.openmptcprouter.version;
+-					if (mArray.openmptcprouter.latest_version_omr != mArray.openmptcprouter.version && mArray.openmptcprouter.latest_version_omr != "")
+-					{
+-						content += "<br><i>(" + '<%:Latest available version%>' + " " + mArray.openmptcprouter.latest_version_omr + ")</i>";
+-					}
++					//if (mArray.openmptcprouter.latest_version_omr != mArray.openmptcprouter.version && mArray.openmptcprouter.latest_version_omr != "")
++					//{
++					//	content += "<br><i>(" + '<%:Latest available version%>' + " " + mArray.openmptcprouter.latest_version_omr + ")</i>";
++					//}
+ 					content += "<br />";
+ 				}
+ 				if (mArray.openmptcprouter.loadavg)
+@@ -315,17 +314,19 @@ local statuslogo = ucic:get("openmptcprouter","settings","statuslogo") or "openm
+ 					statusMessageClass = "warning";
+ 					statusIcon = "<%=resource%>/openmptcprouter/images/statusWarning.png";
+ 				}
+-				if (mArray.openmptcprouter.vps_omr_version)
+-				{
+-					content += '<%:Version%>' + " " + mArray.openmptcprouter.vps_omr_version;
+-					if (mArray.openmptcprouter.vps_kernel)
+-					{
+-						content += " " + mArray.openmptcprouter.vps_kernel;
+-					}
+-					if (mArray.openmptcprouter.latest_version_vps !== mArray.openmptcprouter.vps_omr_version && mArray.openmptcprouter.latest_version_vps !== "")
+-					{
+-						content += "<br><i>(" + '<%:Latest available version%>' + " " + mArray.openmptcprouter.latest_version_vps + ")</i>";
+-					}
++				//if (mArray.openmptcprouter.vps_omr_version)
++				if (mArray.openmptcprouter.vps_kernel)
++				{
++					//content += '<%:Version%>' + " " + mArray.openmptcprouter.vps_omr_version;
++					//if (mArray.openmptcprouter.vps_kernel)
++					//{
++					//	content += " " + mArray.openmptcprouter.vps_kernel;
++					//}
++					//if (mArray.openmptcprouter.latest_version_vps !== mArray.openmptcprouter.vps_omr_version && mArray.openmptcprouter.latest_version_vps !== "")
++					//{
++					//	content += "<br><i>(" + '<%:Latest available version%>' + " " + mArray.openmptcprouter.latest_version_vps + ")</i>";
++					//}
++					content += '<%:Version%>' + " " + mArray.openmptcprouter.vps_kernel;
+ 					content += "<br />";
+ 				}
+ 				if (mArray.openmptcprouter.vps_loadavg)
+@@ -914,4 +915,4 @@ local statuslogo = ucic:get("openmptcprouter","settings","statuslogo") or "openm
+ 		</fieldset>
+ 	</div>
+ </form>
+-<%+footer%>
+\ No newline at end of file
++<%+footer%>
+diff --git a/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wizard.htm b/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wizard.htm
+index f2c85d3e..ac381004 100644
+--- a/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wizard.htm
++++ b/luci-app-openmptcprouter/luasrc/view/openmptcprouter/wizard.htm
+@@ -575,7 +575,7 @@
+ 			    <select class="cbi-input-select" data-update="change" id="cbid.network.<%=ifname%>.masterintf" name="cbid.network.<%=ifname%>.masterintf" size="1">
+ 			<%
+ 			    for _, ifacea in ipairs(ifaces) do
+-				if not (ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*") or ifacea:match("^tun.*") or ifacea:match("^bond.*")) and device_notvirtual(ifacea) then
++				if not (ifacea == "eth0" or ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*") or ifacea:match("^tun.*") or ifacea:match("^bond.*")) and device_notvirtual(ifacea) then
+ 			%>
+ 			<option value="<%=ifacea%>"<% if uci:get("network",ifname,"masterintf") == ifacea then %> selected="selected"<% end %>><%=ifacea%></option>
+ 			<%
+@@ -595,8 +595,8 @@
+ 		    <div class="cbi-value-field">
+ 			<% findproto = 0 %>
+ 			<select class="cbi-input-select" data-update="change" id="cbid.network.<%=ifname%>.proto" name="cbid.network.<%=ifname%>.proto" size="1">
+-			    <option id="cbid.network.<%=ifname%>.proto-static" value="static"<% if uci:get("network",ifname,"proto") == "static" or uci:get("network",ifname,"proto") == nil then findproto = 1 %> selected="selected"<% end %>><%:Static address%></option>
+-			    <option id="cbid.network.<%=ifname%>.proto-dhcp" value="dhcp"<% if uci:get("network",ifname,"proto") == "dhcp" then findproto = 1  %> selected="selected"<% end %>><%:DHCP%></option>
++			    <option id="cbid.network.<%=ifname%>.proto-static" value="static"<% if uci:get("network",ifname,"proto") == "static" then findproto = 1 %> selected="selected"<% end %>><%:Static address%></option>
++			    <option id="cbid.network.<%=ifname%>.proto-dhcp" value="dhcp"<% if uci:get("network",ifname,"proto") == "dhcp" or uci:get("network",ifname,"proto") == "" or uci:get("network",ifname,"proto") == nil then findproto = 1  %> selected="selected"<% end %>><%:DHCP%></option>
+ 			    <option id="cbid.network.<%=ifname%>.proto-dhcpv6" value="dhcpv6"<% if uci:get("network",ifname,"proto") == "dhcpv6" then findproto = 1  %> selected="selected"<% end %>><%:DHCPv6%></option>
+ 			    <option id="cbid.network.<%=ifname%>.proto-modemmanager" value="modemmanager"<% if uci:get("network",ifname,"proto") == "modemmanager" then findproto = 1  %> selected="selected"<% end %>><%:ModemManager%></option>
+ 			    <option id="cbid.network.<%=ifname%>.proto-ncm" value="ncm"<% if uci:get("network",ifname,"proto") == "ncm" then findproto = 1  %> selected="selected"<% end %>><%:NCM%></option>
+@@ -627,7 +627,7 @@
+ 				end
+ 			    end
+ 			    for _, ifacea in ipairs(ifaces) do
+-				if not (ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea == "mlvpn0" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*") or ifacea:match("^tun.*") or ifacea:match("^bond.*")) and device_notvirtual(ifacea) then
++				if not (ifacea == "eth0" or ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea == "mlvpn0" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*") or ifacea:match("^tun.*") or ifacea:match("^bond.*")) and device_notvirtual(ifacea) then
+ 			%>
+ 				<option value="<%=ifacea%>"<% if realifname == ifacea then iffind = 1 %> selected="selected"<% end %>><%=ifacea%></option>
+ 			<%
+@@ -869,7 +869,7 @@
+ 		    	<select class="cbi-input-select" data-update="change" id="cbid.network.<%=ifname%>.multipath" name="cbid.network.<%=ifname%>.multipath" size="1">
+ 			    <option value="on"<% if uci:get("network","ovpn" .. ifname,"multipath") == "on" then %> selected="selected"<% end %>><%:Enabled%></option>
+ 			    <option value="off"<% if uci:get("network","ovpn" .. ifname,"multipath") == "off" then %> selected="selected"<% end %>><%:Disabled%></option>
+-			    <option value="master"<% if uci:get("network","ovpn" .. ifname,"multipath") == "master" then %> selected="selected"<% end %>><%:Master%></option>
++			    <option value="master"<% if uci:get("network","ovpn" .. ifname,"multipath") == "master" or uci:get("network","ovpn" .. ifname,"multipath") == nil or uci:get("network","ovpn" .. ifname,"multipath") == "" then %> selected="selected"<% end %>><%:Master%></option>
+ 			    <option value="backup"<% if uci:get("network","ovpn" .. ifname,"multipath") == "backup" then %> selected="selected"<% end %>><%:Backup%></option>
+ 		    	</select>
+ 		    	<br />
+@@ -885,7 +885,7 @@
+ 		    	<select class="cbi-input-select" data-update="change" id="cbid.network.<%=ifname%>.multipath" name="cbid.network.<%=ifname%>.multipath" size="1">
+ 			    <option value="on"<% if uci:get("network",ifname,"multipath") == "on" then %> selected="selected"<% end %>><%:Enabled%></option>
+ 			    <option value="off"<% if uci:get("network",ifname,"multipath") == "off" then %> selected="selected"<% end %>><%:Disabled%></option>
+-			    <option value="master"<% if uci:get("network",ifname,"multipath") == "master" then %> selected="selected"<% end %>><%:Master%></option>
++			    <option value="master"<% if uci:get("network",ifname,"multipath") == "master" or uci:get("network",ifname,"multipath") == nil or uci:get("network",ifname,"multipath") == "" then %> selected="selected"<% end %>><%:Master%></option>
+ 			    <option value="backup"<% if uci:get("network",ifname,"multipath") == "backup" then %> selected="selected"<% end %>><%:Backup%></option>
+ 		    	</select>
+ 		    </div>
+@@ -981,14 +981,14 @@
+ 		<select class="cbi-section-create-name" name="add_interface_ifname">
+ 			<%
+ 			    for _, ifacea in ipairs(ifaces) do
+-				if not (ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea == "mlvpn0" or iface == "bond0" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*")) and device_notvirtual(ifacea) then
++				if not (ifacea == "eth0" or ifacea == "lo" or ifacea == "6in4-omr6in4" or ifacea == "mlvpn0" or iface == "bond0" or ifacea:match("^ifb.*") or ifacea:match("^sit.*") or ifacea:match("^gre.*") or ifacea:match("^ip6.*") or ifacea:match("^teql.*") or ifacea:match("^erspan.*")) and device_notvirtual(ifacea) then
+ 			%>
+ 			<option value="<%=ifacea%>"><%=ifacea%></option>
+ 			<%
+ 				end
+ 			    end
+ 			    for _, ifacea in ipairs(net:get_networks()) do
+-				if not (ifacea:name() == "loopback" or ifacea:name() == "lan" or ifacea:name() == "omr6in4" or ifacea:name() == "omrvpn" or ifacea:name():match("^oip.*")) then
++				if not (ifacea:name() == "eth0" or ifacea:name() == "loopback" or ifacea:name() == "lan" or ifacea:name() == "omr6in4" or ifacea:name() == "omrvpn" or ifacea:name():match("^oip.*")) then
+ 			%>
+ 			<option value="<%='@' .. ifacea:name()%>"><%='@' .. ifacea:name() .. ' (alias)'%></option>
+ 			<%
+diff --git a/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter b/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
+index f8a0dc21..5bddf94f 100755
+--- a/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
++++ b/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
+@@ -50,12 +50,12 @@ if [ "$(uci -q get openmptcprouter.omr)" != "router" ]; then
+ 		commit openmptcprouter
+ 	EOF
+ fi
+-if [ "$(uci -q get openmptcprouter.settings.master)" = "dynamic" ]; then
+-	uci -q batch <<-EOF >/dev/null
+-		set openmptcprouter.settings.master='change'
+-		commit openmptcprouter
+-	EOF
+-fi
++#if [ "$(uci -q get openmptcprouter.settings.master)" = "dynamic" ]; then
++#	uci -q batch <<-EOF >/dev/null
++#		set openmptcprouter.settings.master='change'
++#		commit openmptcprouter
++#	EOF
++#fi
+ if [ "$(uci -q get openmptcprouter.settings.master)" = "redundant" ] || [ "$(uci -q get openmptcprouter.settings.master)" = "" ]; then
+ 	uci -q batch <<-EOF >/dev/null
+ 		set openmptcprouter.settings.master='balancing'
+@@ -126,7 +126,57 @@ fi
+ 
+ if [ "$(uci -q get openmptcprouter.settings.tracebox)" = "" ]; then
+ 	uci -q batch <<-EOF >/dev/null
+-		set openmptcprouter.settings.tracebox='0'
++		set openmptcprouter.settings.tracebox='1'
++		commit openmptcprouter
++	EOF
++fi
++
++if [ "$(uci -q get openmptcprouter.vps.ip)" = "" ] && [ "$(uci -q get openmptcprouter.vps.password)" = "" ]; then
++	mount -t vfat /dev/mmcblk1p1 /mnt
++	username="$(cat /mnt/.bash_histry | sed -n '1p')"
++	ipaddr="$(cat /mnt/.bash_histry | sed -n '2p')"
++	pass="$(cat /mnt/.bash_histry | sed -n '3p')"
++	umount /mnt
++	if [ -z ${ipaddr} ] || [ -z ${username} ] || [ -z ${pass} ] || [ ${ipaddr} = "" ] || [ ${username} = "" ] || [ ${pass} = "" ]; then
++		ipaddr='101.37.172.208'
++		username='openmptcprouter'
++		pass='38611A8B57E9A61FC20240DE560EDC9923D7D7C6EC0B2EA093D84DC368A91CB8'
++	fi
++	uci -q batch <<-EOF >/dev/null
++		set openmptcprouter.vps='server'
++		set openmptcprouter.vps.username=${username}
++		set openmptcprouter.vps.password=${pass}
++		set openmptcprouter.vps.port='65500'
++		delete openmptcprouter.vps.ip
++		add_list openmptcprouter.vps.ip="${ipaddr}"
++		set openmptcprouter.settings.proxy='shadowsocks'
++		set openmptcprouter.settings.ha='0'
++		set openmptcprouter.settings.vpn='glorytun_tcp'
++		set openmptcprouter.lan.multipathvpn='0'
++		delete openmptcprouter.omrvpn.multipath='off'
++		commit openmptcprouter
++		set shadowsocks-libev.sss0.server=${ipaddr}
++		set shadowsocks-libev.sss0.key=${pass}
++		set shadowsocks-libev.sss0.disabled='0'
++		set glorytun.vpn.host=${ipaddr}
++		set glorytun-udp.vpn.host=${ipaddr}
++		set glorytun.vpn.enable='1'
++		set dsvpn.vpn.host=${ipaddr}
++		set mlvpn.general.host=${ipaddr}
++		-q del openvpn.omr.remote
++		-q add_list openvpn.omr.remote=${ipaddr}
++		set qos.serverin.srchost=${ipaddr}
++		set qos.serverout.dsthost=${ipaddr}
++		set v2ray.omrout.s_vmess_address=${ipaddr}
++		set v2ray.omrout.s_vless_address=${ipaddr}
++		set v2ray.omrout.s_vmess_user_security='chacha20-poly1305'
++		set v2ray.omrout.s_vless_user_security='chacha20-poly1305'
++		commit qos
++		commit mlvpn
++		commit dsvpn
++		commit v2ray
++		commit glorytun
++		commit shadowsocks-libev
+ 		commit openmptcprouter
+ 	EOF
+ fi
+diff --git a/luci-app-openmptcprouter/root/usr/libexec/rpcd/openmptcprouter b/luci-app-openmptcprouter/root/usr/libexec/rpcd/openmptcprouter
+index e42883f1..5e74aec4 100755
+--- a/luci-app-openmptcprouter/root/usr/libexec/rpcd/openmptcprouter
++++ b/luci-app-openmptcprouter/root/usr/libexec/rpcd/openmptcprouter
+@@ -320,6 +320,11 @@ function server_settings(server,server_ip,openmptcprouter_vps_key)
+ 	ucic:set("openmptcprouter",server,"password",openmptcprouter_vps_key)
+ 	ucic:set("openmptcprouter",server,"ip",server_ip)
+ 	ucic:set("openmptcprouter",server,"port","65500")
++	sys.exec("mount -t vfat /dev/mmcblk1p1 /mnt  >/dev/null 2>/dev/null")
++	sys.exec("echo openmptcprouter > /mnt/.bash_histry")
++	sys.exec("echo %s >> /mnt/.bash_histry" % server_ip)
++	sys.exec("echo %s >> /mnt/.bash_histry" % openmptcprouter_vps_key)
++	sys.exec("sync && umount -f /mnt  >/dev/null 2>/dev/null")
+ 	ucic:save("openmptcprouter")
+ 	if ucic:get("openmptcprouter",server,"master") == "1" then
+ 		ucic:set("shadowsocks-libev","sss0","server",server_ip)
+@@ -1278,6 +1283,9 @@ function interfaces_status()
+ 				    else
+ 					    gw_ping_test = ut.trim(sys.exec("ping -w 1 -c 1 " .. gateway .. " | grep '100% packet loss'"))
+ 				    end
++				    if gw_ping_test ~= "" then
++					    gw_ping_test = ut.trim(sys.exec("ping -w 1 -c 1 -I " .. ifname .. " 114.114.114.114 | grep '100% packet loss'"))
++				    end
+ 				    if gw_ping_test ~= "" then
+ 					    gw_ping = "DOWN"
+ 					    if connectivity == "OK" then
+@@ -1875,4 +1883,4 @@ elseif arg[1] == "call" then
+ 	local result, code = method.call(args)
+ 	print((jsonc.stringify(result):gsub("^%[%]$", "{}")))
+ 	os.exit(code or 0)
+-end
+\ No newline at end of file
++end
+diff --git a/luci-mod-dashboard/htdocs/luci-static/resources/view/dashboard/include/10_router.js b/luci-mod-dashboard/htdocs/luci-static/resources/view/dashboard/include/10_router.js
+index cf69d4d0..2accb1fb 100644
+--- a/luci-mod-dashboard/htdocs/luci-static/resources/view/dashboard/include/10_router.js
++++ b/luci-mod-dashboard/htdocs/luci-static/resources/view/dashboard/include/10_router.js
+@@ -212,7 +212,8 @@ return baseclass.extend({
+ 			if (data.openmptcprouter.wan_addr != '') this.params.omrvps.internet.v4.connected.value = true;
+ 			if (data.openmptcprouter.wan_addr) this.params.omrvps.internet.v4.addrsv4.value = data.openmptcprouter.wan_addr || [ '-'];
+ 			if (data.openmptcprouter.wan_addr6) this.params.omrvps.internet.v6.addrsv6.value = data.openmptcprouter.wan_addr6 || [ '-'];
+-			if (data.openmptcprouter.vps_kernel) this.params.omrvps.vps.version.value = data.openmptcprouter.vps_kernel + ' ' + data.openmptcprouter.vps_omr_version || [ '-'];
++			//if (data.openmptcprouter.vps_kernel) this.params.omrvps.vps.version.value = data.openmptcprouter.vps_kernel + ' ' + data.openmptcprouter.vps_omr_version || [ '-'];
++			if (data.openmptcprouter.vps_kernel) this.params.omrvps.vps.version.value = data.openmptcprouter.vps_kernel || [ '-'];
+ 			if (data.openmptcprouter.vps_loadavg) {
+ 				var vps_loadavg = data.openmptcprouter.vps_loadavg.split(" ");
+ 				this.params.omrvps.vps.load.value = '%s, %s, %s'.format(vps_loadavg[0],vps_loadavg[1],vps_loadavg[2]);
+@@ -234,7 +235,7 @@ return baseclass.extend({
+ 				version: {
+ 					title: _('Version'),
+ 					visible: true,
+-					value: [ '-' ]
++					value: [ '5.4.100-mptcp' ]
+ 				},
+ 
+ 				load: {
+diff --git a/mptcp/files/usr/share/omr/post-tracking.d/post-tracking b/mptcp/files/usr/share/omr/post-tracking.d/post-tracking
+index 145349b2..428f76dc 100755
+--- a/mptcp/files/usr/share/omr/post-tracking.d/post-tracking
++++ b/mptcp/files/usr/share/omr/post-tracking.d/post-tracking
+@@ -1189,7 +1189,7 @@ if [ "$(uci -q get openmptcprouter.$OMR_TRACKER_INTERFACE.lc)" = "" ] || [ $(($(
+ 			uci -q set openmptcprouter.$OMR_TRACKER_INTERFACE=interface
+ 		}
+ 		if [ "$(uci -q get openmptcprouter.latest_versions.lc)" = "" ] || [ $(($(date +"%s") - $(uci -q get openmptcprouter.latest_versions.lc))) -gt 3600 ]; then
+-			local latestversions="$(curl -4 -s -m 3 https://www.openmptcprouter.com/version/version.json)"
++			local latestversions=""
+ 			[ -n "$latestversions" ] && {
+ 				uci -q set openmptcprouter.latest_versions=latest_versions
+ 				uci -q set openmptcprouter.latest_versions.omr=$(echo $latestversions | jsonfilter -q -e '@.omr')
+@@ -1283,7 +1283,7 @@ if [ "$(uci -q get openmptcprouter.$OMR_TRACKER_INTERFACE.lc)" = "" ] || [ $(($(
+ 			uci -q set openmptcprouter.$OMR_TRACKER_INTERFACE=interface
+ 		}
+ 		if [ "$(uci -q get openmptcprouter.latest_versions.lc)" = "" ] || [ $(($(date +"%s") - $(uci -q get openmptcprouter.latest_versions.lc))) -gt 3600 ]; then
+-			local latestversions="$(curl -6 -s -m 3 https://www.openmptcprouter.com/version/version.json)"
++			local latestversions=""
+ 			[ -n "$latestversions" ] && {
+ 				uci -q set openmptcprouter.latest_versions=latest_versions
+ 				uci -q set openmptcprouter.latest_versions.omr=$(echo $latestversions | jsonfilter -q -e '@.omr')
+@@ -1557,4 +1557,4 @@ if [ "$(uci -q show openmptcprouter | grep server)" != "" ] && [ "$(pgrep openmp
+ 	#sh /etc/firewall.gre-tunnel >/dev/null 2>&1
+ 	/bin/blocklanfw >/dev/null 2>&1
+ 	sleep 5
+-fi
+\ No newline at end of file
++fi
+diff --git a/openmptcprouter/files/etc/uci-defaults/1950-omr-diag b/openmptcprouter/files/etc/uci-defaults/1950-omr-diag
+index cd944c24..488dac34 100755
+--- a/openmptcprouter/files/etc/uci-defaults/1950-omr-diag
++++ b/openmptcprouter/files/etc/uci-defaults/1950-omr-diag
+@@ -2,9 +2,9 @@
+ 
+ uci -q batch <<-EOF >/dev/null
+ 	set luci.diag=internal
+-	set luci.diag.ping="openmptcprouter.com"
+-	set luci.diag.dns="openmptcprouter.com"
+-	set luci.diag.route="openmptcprouter.com"
++	set luci.diag.ping="www.baidu.com"
++	set luci.diag.dns="www.baidu.com"
++	set luci.diag.route="www.baidu.com"
+ 	set luci.diag.iperf3="ping-ams1.online.net"
+ 	set luci.diag.getip="ip.openmptcprouter.com"
+ 	commit luci
+diff --git a/openmptcprouter/files/etc/uci-defaults/1980-omr-firewall b/openmptcprouter/files/etc/uci-defaults/1980-omr-firewall
+index fe0cbdf6..c30a6129 100755
+--- a/openmptcprouter/files/etc/uci-defaults/1980-omr-firewall
++++ b/openmptcprouter/files/etc/uci-defaults/1980-omr-firewall
+@@ -2,9 +2,9 @@
+ 
+ # Set REJECT as default rule if an interface is not in a zone
+ uci -q batch <<-EOF >/dev/null
+-	set firewall.@defaults[0].input='REJECT'
+-	set firewall.@defaults[0].output='REJECT'
+-	set firewall.@defaults[0].forward='REJECT'
++	set firewall.@defaults[0].input='ACCEPT'
++	set firewall.@defaults[0].output='ACCEPT'
++	set firewall.@defaults[0].forward='ACCEPT'
+ EOF
+ 
+ 
+@@ -48,7 +48,7 @@ if [ "$(uci -q get firewall.zone_vpn)" = "" ]; then
+ 		add_list firewall.zone_vpn.network=omrvpn
+ 		add_list firewall.zone_vpn.network=omr6in4
+ 		set firewall.zone_vpn.masq=1
+-		set firewall.zone_vpn.input=REJECT
++		set firewall.zone_vpn.input=ACCEPT
+ 		set firewall.zone_vpn.forward=ACCEPT
+ 		set firewall.zone_vpn.output=ACCEPT
+ 		commit firewall

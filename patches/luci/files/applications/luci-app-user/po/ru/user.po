@@ -1,0 +1,94 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2020-04-28 13:41+0000\n"
+"Last-Translator: Google translator\n"
+"luciapplicationsuser/ru/>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<="
+"4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"X-Generator: Weblate 4.0.2\n"
+
+#: applications/luci-app-user/root/usr/share/luci/menu.d/luci-app-user.json:3
+msgid "User Password"
+msgstr "пользовательский пароль"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:267
+msgid "Cannot encrypt plaintext password since uhttpd is not installed."
+msgstr ""
+"Невозможно зашифровать простой текстовый пароль, так как uhttpd не "
+"установлен."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:79
+msgid "Description"
+msgstr "Описание"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:212
+msgid "Login name"
+msgstr "Имя пользователя"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:202
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "LuCI Logins"
+msgstr "Пользователи LuCI"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "New account"
+msgstr "Новый аккаунт"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:244
+msgid "Password value"
+msgstr "Пароль"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:215
+msgid "Password variant"
+msgstr "Вариант пароля"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:289
+msgid "Session timeout"
+msgstr "Таймаут сессии"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:259
+msgid "The password may not start with \"$p$\"."
+msgstr "Пароль может не начинаться с «$p$»."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "The system account to use the password from"
+msgstr "Системная учетная запись для использования пароля"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "UNIX account"
+msgstr "UNIX аккаунт"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:282
+msgid "Unable to encrypt plaintext password: %s"
+msgstr "Невозможно зашифровать простой текстовый пароль: %s"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:217
+msgid "Use UNIX password in /etc/shadow"
+msgstr "Использовать пароль UNIX из /etc/shadow"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:218
+msgid "Use encrypted password hash"
+msgstr "Использовать зашифрованный хэш пароля"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:219
+msgid "Use plain password"
+msgstr "Использовать простой (открытый) пароль"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:294
+msgid "does not expire"
+msgstr "не истекает"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:92
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:111
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:306
+msgctxt "Only read permissions granted"
+msgid "readonly"
+msgstr "только чтение"
+
+#~ msgid "Acess level"
+#~ msgstr "Уровень доступа"

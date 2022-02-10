@@ -1,0 +1,82 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2020-04-22 19:41+0000\n"
+"Last-Translator: Google translator\n"
+"luciapplicationsuser/fr/>\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=n > 1;\n"
+"X-Generator: Weblate 4.0.2-dev\n"
+
+#: applications/luci-app-user/root/usr/share/luci/menu.d/luci-app-user.json:3
+msgid "User Password"
+msgstr "mot de passe de l'utilisateur"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:78
+msgid "user group"
+msgstr "Groupe user"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:267
+msgid "Cannot encrypt plaintext password since uhttpd is not installed."
+msgstr ""
+"Impossible de crypter le mot de passe en clair car uhttpd n'est pas installé."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:79
+msgid "Description"
+msgstr "Description"
+
+#: applications/luci-app-user/root/usr/share/rpcd/user.d/luci-app-user.json:3
+msgid "Grant access to user configuration"
+msgstr "Accès complète à la configuration du user"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:212
+msgid "Login name"
+msgstr "Login nom"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:202
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "LuCI Logins"
+msgstr "Luci Logins"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:209
+msgid "New account"
+msgstr "Nouv. compte"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:244
+msgid "Password value"
+msgstr "Valeur Password"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:215
+msgid "Password variant"
+msgstr "Variant Password"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:259
+msgid "The password may not start with \"$p$\"."
+msgstr "Le mot de passe ne doit pas commencer par \"$p$\"."
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "The system account to use the password from"
+msgstr "Le compte du système pour utiliser le mot de passe de"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:232
+msgid "UNIX account"
+msgstr "UNIX account"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:282
+msgid "Unable to encrypt plaintext password: %s"
+msgstr "Impossible de crypter le mot de passe en texte clair : %s"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:217
+msgid "Use UNIX password in /etc/shadow"
+msgstr "Utiliser le password UNIX dans /etc/shadow"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:218
+msgid "Use encrypted password hash"
+msgstr "Utiliser un hachage de mot de passe crypté"
+
+#: applications/luci-app-user/htdocs/luci-static/resources/view/system/user.js:219
+msgid "Use plain password"
+msgstr "Utiliser un mot de passe simple"

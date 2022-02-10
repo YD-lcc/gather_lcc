@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ "$(uci -q get luci.themes.SYSTEM)" = "" ]; then
+	uci batch <<-EOF
+		set luci.themes.SYSTEM=/luci-static/openmptcprouter
+		set luci.main.mediaurlbase=/luci-static/openmptcprouter
+		commit luci
+	EOF
+fi
+exit 0

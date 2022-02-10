@@ -1,0 +1,16 @@
+{
+	"luci-app-user": {
+		"description": "Change User Password",
+		"read": {
+			"cgi-io": [ "list", "read" ],
+			"file": {
+				"/usr/sbin/uhttpd": [ "list" ],
+				"/usr/sbin/uhttpd -m *": [ "exec" ]
+			},
+			"uci": [ "rpcd" ]
+		},
+		"write": {
+			"uci": [ "rpcd" ]
+		}
+	}
+}

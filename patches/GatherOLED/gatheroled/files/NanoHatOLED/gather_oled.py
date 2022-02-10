@@ -193,7 +193,7 @@ def draw_page():
     draw_logo()
     for i in range(1, netCount + 1):
         try:
-            cmd = "uci get network.wan" + str(i) + ".ifname | tr -d '\n'"
+            cmd = "uci get network.wan" + str(i) + ".device | tr -d '\n'"
             ifname = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
             cmd = "ip -4 r list dev " + ifname + " | grep default | awk '{print $3}' | tr -d '\n'"
             destaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
@@ -211,8 +211,13 @@ def draw_page():
                 cmd = "(uci get openmptcprouter.wan" + str(i) + ".manufacturer || uci get network.usbwan" + str(i) + ".proto || uci get network.wan" + str(i) + ".proto || true) | tr -d '\n'"
                 temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "")
                 if temp == "huawei":
-                    cmd = "(omr-huawei " + destaddr + " all || true) | awk -F';' '{print $1}'"
+                    cmd = "(omr-huawei-old " + destaddr + " all || true) | awk -F';' '{print $1}'"
                     temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
+                    if temp == "":
+                        temp = "ip -4 -br addr ls dev " + ifname + " | awk -F'[ /]+' '{print $3}' | tr -d '\n'"
+                        hipaddr = subprocess.check_output(cmd, shell = True ).decode("utf-8", errors="ignore")
+                        cmd = "(omr-huawei " + hipaddr + " " + destaddr + " all || true) | awk -F';' '{print $1}'"
+                        temp = subprocess.check_output(cmd, shell = True).decode("utf-8", errors="ignore").replace("\n", "").replace("signal", "")
                     if temp != "":
                         draw_net(ifname, temp)
                         continue

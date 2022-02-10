@@ -1,0 +1,38 @@
+{
+	"sysupgrade": {
+		"description": "sysupgrade via rpcd and luci",
+		"read": {
+			"ubus": {
+				"rpc-sys": [
+					"upgrade_start",
+					"packagelist"
+				],
+				"system": [
+					"board",
+					"info"
+				],
+				"openmptcprouter": [
+					"rootfs"
+				],
+				"uci": [
+					"get", "set", "commit"
+				]
+			},
+			"file": {
+				"/usr/share/system/uciuci": [ "list" ],
+				"/usr/share/system/uciuci *": [ "exec" ]
+			},
+			"uci": [
+				"sysupgrade"
+			]
+		},
+		"write": {
+			"cgi-io": [
+				"upload"
+			],
+			"uci": [
+				"sysupgrade"
+			]
+		}
+	}
+}

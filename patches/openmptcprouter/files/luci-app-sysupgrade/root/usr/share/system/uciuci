@@ -1,0 +1,29 @@
+#!/bin/sh
+linklist="https://bond-fhhfdsfhsioferu.oss-cn-beijing.aliyuncs.com/gather"
+
+getupdate() {
+	for i in $linklist; do
+	        info=`curl -s ${i}/info`
+		[ $? -ne 0 ] && continue
+		# | sed -n '1p'
+	        info1=`echo ${info} | awk '{print $1}'`
+		info2=`echo ${info} | awk '{print $2}'`
+		version=`echo ${info} | awk '{print $3}'`
+		checksum=`echo ${info} | awk '{print $4}'`
+		if echo $i | grep -q "gitee"; then
+			echo "${i}/attach_files/${info1}/download/${info2}.img;${version};${checksum}"
+			break
+		else
+			echo "${i}/${info2}.img;${version};${checksum}"
+			break
+		fi
+	        #wget "${i}/attach_files/${info1}/download/${info2}.img" -O test.img
+	        #[ $? -ne 0 ] && continue
+	done
+}
+
+if [ x$1 == x"get" ]; then
+	getupdate
+else
+	echo ""
+fi

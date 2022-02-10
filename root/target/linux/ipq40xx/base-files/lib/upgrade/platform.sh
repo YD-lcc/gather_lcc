@@ -59,7 +59,7 @@ platform_do_upgrade() {
 	case "$(board_name)" in
 	8dev,jalapeno |\
 	aruba,ap-303 |\
-    pangu,l1000 |\
+	pangu,l1000 |\
 	aruba,ap-303h |\
 	aruba,ap-365 |\
 	avm,fritzbox-7530 |\
@@ -73,8 +73,7 @@ platform_do_upgrade() {
 	glinet,gl-ap1300 |\
 	luma,wrtq-329acn |\
 	mobipromo,cm520-79f |\
-    p2w,r619ac-64m |\
- 	p2w,r619ac-128m |\
+	zbt,z4019 |\
 	qxwlan,e2600ac-c2)
 		nand_do_upgrade "$1"
 		;;
@@ -113,6 +112,11 @@ platform_do_upgrade() {
 	meraki,mr33)
 		CI_KERNPART="part.safe"
 		nand_do_upgrade "$1"
+		;;
+	mikrotik,hap-ac2|\
+	mikrotik,sxtsq-5-ac)
+		[ "$(rootfs_type)" = "tmpfs" ] && mtd erase firmware
+		default_do_upgrade "$1"
 		;;
 	openmesh,a42 |\
 	openmesh,a62 |\

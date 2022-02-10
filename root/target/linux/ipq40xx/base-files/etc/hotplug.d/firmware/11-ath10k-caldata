@@ -60,8 +60,6 @@ case "$FIRMWARE" in
 	glinet,gl-s1300 |\
 	linksys,ea6350v3 |\
 	mobipromo,cm520-79f |\
-    p2w,r619ac-64m |\
- 	p2w,r619ac-128m |\
 	qcom,ap-dk01.1-c1)
 		caldata_extract "ART" 0x1000 0x2f20
 		;;
@@ -137,7 +135,7 @@ case "$FIRMWARE" in
 		caldata_extract "ART" 0x1000 0x2f20
 		ath10k_patch_mac $(macaddr_add "$(cat /sys/class/net/eth0/address)" 2)
 		;;
-    pangu,l1000)
+	pangu,l1000)
 		caldata_extract "ART" 0x1000 0x2f20
 		ath10k_patch_mac $(macaddr_add "$(cat /sys/class/net/eth0/address)" 2)
 		;;
@@ -145,6 +143,11 @@ case "$FIRMWARE" in
 		caldata_extract_ubi "ART" 0x1000 0x2f20
 		caldata_valid "202f" || caldata_extract "ART" 0x1000 0x2f20
 		ath10k_patch_mac $(macaddr_add $(get_mac_binary "/sys/bus/i2c/devices/0-0050/eeprom" 0x66) +2)
+		;;
+	mikrotik,hap-ac2)
+		wlan_data="/sys/firmware/mikrotik/hard_config/wlan_data"
+		( [ -f "$wlan_data" ] && caldata_sysfsload_from_file "$wlan_data" 0x0 0x2f20 ) || \
+		( [ -d "$wlan_data" ] && caldata_sysfsload_from_file "$wlan_data/data_0" 0x0 0x2f20 )
 		;;
 	netgear,ex6100v2 |\
 	netgear,ex6150v2)
@@ -155,6 +158,10 @@ case "$FIRMWARE" in
 	zyxel,wre6606)
 		caldata_extract "ART" 0x1000 0x2f20
 		ath10k_patch_mac $(macaddr_add $(cat /sys/class/net/eth0/address) -2)
+		;;
+	zbt,z4019)
+		caldata_extract "0:ART" 0x1000 0x2f20
+		ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:ART" 0x6) +1)
 		;;
 	esac
 	;;
@@ -170,8 +177,6 @@ case "$FIRMWARE" in
 	glinet,gl-s1300 |\
 	linksys,ea6350v3 |\
 	mobipromo,cm520-79f |\
-	p2w,r619ac-64m |\
- 	p2w,r619ac-128m |\
 	qcom,ap-dk01.1-c1)
 		caldata_extract "ART" 0x5000 0x2f20
 		;;
@@ -247,7 +252,7 @@ case "$FIRMWARE" in
 		caldata_extract "ART" 0x5000 0x2f20
 		ath10k_patch_mac $(macaddr_add "$(cat /sys/class/net/eth0/address)" 3)
 		;;
-    pangu,l1000)
+	pangu,l1000)
 		caldata_extract "ART" 0x5000 0x2f20
 		ath10k_patch_mac $(macaddr_add "$(cat /sys/class/net/eth0/address)" 3)
 		;;
@@ -255,6 +260,12 @@ case "$FIRMWARE" in
 		caldata_extract_ubi "ART" 0x5000 0x2f20
 		caldata_valid "202f" || caldata_extract "ART" 0x5000 0x2f20
 		ath10k_patch_mac $(macaddr_add $(get_mac_binary "/sys/bus/i2c/devices/0-0050/eeprom" 0x66) +3)
+		;;
+	mikrotik,hap-ac2|\
+	mikrotik,sxtsq-5-ac)
+		wlan_data="/sys/firmware/mikrotik/hard_config/wlan_data"
+		( [ -f "$wlan_data" ] && caldata_sysfsload_from_file "$wlan_data" 0x8000 0x2f20 ) || \
+		( [ -d "$wlan_data" ] && caldata_sysfsload_from_file "$wlan_data/data_2" 0x0 0x2f20 )
 		;;
 	netgear,ex6100v2 |\
 	netgear,ex6150v2)
@@ -265,6 +276,10 @@ case "$FIRMWARE" in
 	zyxel,wre6606)
 		caldata_extract "ART" 0x5000 0x2f20
 		ath10k_patch_mac $(macaddr_add $(cat /sys/class/net/eth0/address) -1)
+		;;
+	zbt,z4019)
+		caldata_extract "0:ART" 0x5000 0x2f20
+		ath10k_patch_mac $(macaddr_add $(mtd_get_mac_binary "0:ART" 0x6) +2)
 		;;
 	esac
 	;;
