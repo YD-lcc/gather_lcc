@@ -1,0 +1,46 @@
+diff -Naru a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts
+--- a/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-01-12 12:05:48.055215480 +0800
++++ b/arch/arm/boot/dts/sun8i-h3-nanopi-neo.dts	2021-01-12 12:20:24.431930700 +0800
+@@ -43,8 +43,8 @@
+ #include "sun8i-h3-nanopi.dtsi"
+ 
+ / {
+-	model = "FriendlyARM NanoPi NEO";
+-	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
++	model = "BOND NANO 6";
++	compatible = "allwinner,sun8i-h3";
+ };
+ 
+ &mmc2 {
+@@ -84,6 +84,31 @@
+ 	dr_mode = "peripheral";
+ };
+ 
++&ehci1 {
++        status = "okay";
++};
++
++&ohci1 {
++        status = "okay";
++};
++
++&ehci2 {
++        status = "okay";
++};
++
++&ohci2 {
++        status = "okay";
++};
++
++&ehci3 {
++        status = "okay";
++};
++
++&ohci3 {
++        status = "okay";
++};
++
+ &usbphy {
+ 	usb0_id_det-gpios = <&pio 6 12 GPIO_ACTIVE_HIGH>; /* PG12 */
++	status = "okay";
+ };

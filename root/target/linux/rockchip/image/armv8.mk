@@ -1,6 +1,17 @@
+
 # SPDX-License-Identifier: GPL-2.0-only
 #
 # Copyright (C) 2020 Tobias Maedel
+
+define Device/rk3328_gather-v2
+  DEVICE_VENDOR := Gather
+  DEVICE_MODEL := Gather V2
+  SOC := rk3328
+  UBOOT_DEVICE_NAME := gather-v2-rk3328
+  IMAGE/sysupgrade.img.gz := boot-common | boot-script nanopi-r2s | pine64-img | gzip | append-metadata
+  DEVICE_PACKAGES := kmod-usb-net-rtl8152
+endef
+TARGET_DEVICES += rk3328_gather-v2
 
 define Device/friendlyarm_nanopi-r2s
   DEVICE_VENDOR := FriendlyARM

@@ -1,0 +1,26 @@
+diff -Naru a/arch/arm/dts/sun8i-h3-nanopi-neo.dts b/arch/arm/dts/sun8i-h3-nanopi-neo.dts
+--- a/arch/arm/dts/sun8i-h3-nanopi-neo.dts	2021-01-13 14:44:05.691224417 +0800
++++ b/arch/arm/dts/sun8i-h3-nanopi-neo.dts	2021-01-13 14:46:53.347005761 +0800
+@@ -43,8 +43,8 @@
+ #include "sun8i-h3-nanopi.dtsi"
+ 
+ / {
+-	model = "FriendlyARM NanoPi NEO";
+-	compatible = "friendlyarm,nanopi-neo", "allwinner,sun8i-h3";
++	model = "BOND NANO 6";
++	compatible = "allwinner,sun8i-h3";
+ };
+ 
+ &ehci0 {
+diff -Naru a/configs/nanopi_neo_defconfig b/configs/nanopi_neo_defconfig
+--- a/configs/nanopi_neo_defconfig	2021-01-13 14:51:07.254789975 +0800
++++ b/configs/nanopi_neo_defconfig	2021-01-13 14:47:50.713668256 +0800
+@@ -7,6 +7,5 @@
+ # CONFIG_SYS_MALLOC_CLEAR_ON_INIT is not set
+ CONFIG_CONSOLE_MUX=y
+ CONFIG_DEFAULT_DEVICE_TREE="sun8i-h3-nanopi-neo"
+-CONFIG_SUN8I_EMAC=y
+-CONFIG_USB_EHCI_HCD=y
+-CONFIG_USB_OHCI_HCD=y
++CONFIG_BOOTDELAY=0
++CONFIG_MMC_SUNXI_SLOT_EXTRA=2

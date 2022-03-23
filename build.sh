@@ -26,7 +26,7 @@ _get_repo() (
 	git checkout -f "origin/$3" -B "build" 2>/dev/null || git checkout "$3" -B "build"
 )
 
-ManualVersion=g-v1.0.1
+ManualVersion=b-v1.0.2
 
 OMR_DIST=${OMR_DIST:-openmptcprouter}
 OMR_HOST=${OMR_HOST:-$(curl -sS ifconfig.co)}
@@ -36,13 +36,13 @@ OMR_IMG=${OMR_IMG:-yes}
 #OMR_UEFI=${OMR_UEFI:-yes}
 OMR_PACKAGES=${OMR_PACKAGES:-full}
 OMR_ALL_PACKAGES=${OMR_ALL_PACKAGES:-no}
-OMR_TARGET=${OMR_TARGET:-nanopi_neo}
+OMR_TARGET=${OMR_TARGET:-rk3328-gather}
 OMR_TARGET_CONFIG="config-$OMR_TARGET"
 OMR_KERNEL=${OMR_KERNEL:-5.4}
 SHORTCUT_FE=${SHORTCUT_FE:-yes}
 #OMR_RELEASE=${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | sed 's/^\([0-9.]*\).*/\1/')}
 #OMR_RELEASE=${OMR_RELEASE:-$(git tag --sort=committerdate | tail -1)}
-OMR_RELEASE="0.78.0-g"
+OMR_RELEASE="gather-v2"
 #${OMR_RELEASE:-$(git describe --tags `git rev-list --tags --max-count=1` | tail -1 | cut -d '-' -f1)}
 OMR_REPO="localhost"
 #${OMR_REPO:-http://$OMR_HOST:$OMR_PORT/release/$OMR_RELEASE/$OMR_TARGET}
@@ -81,6 +81,10 @@ elif [ "$OMR_TARGET" = "espressobin" ]; then
 	OMR_REAL_TARGET="aarch64_cortex-a53"
 elif [ "$OMR_TARGET" = "x86" ]; then
 	OMR_REAL_TARGET="i386_pentium4"
+elif [ "$OMR_TARGET" = "r2s" ]; then
+	OMR_REAL_TARGET="aarch64_generic"
+elif [ "$OMR_TARGET" = "rk3328-gather" ]; then
+        OMR_REAL_TARGET="aarch64_generic"
 else
 	OMR_REAL_TARGET=${OMR_TARGET}
 fi
@@ -276,7 +280,7 @@ fi
 echo "Done"
 
 # Add BBR2 patch, only working on 64bits images for now
-if [ "$OMR_TARGET" = "x86_64" ] || [ "$OMR_TARGET" = "bpi-r64" ] || [ "$OMR_TARGET" = "rpi4" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "r2s" ] || [ "$OMR_TARGET" = "rpi3" ]; then
+if [ "$OMR_TARGET" = "x86_64" ] || [ "$OMR_TARGET" = "bpi-r64" ] || [ "$OMR_TARGET" = "rpi4" ] || [ "$OMR_TARGET" = "espressobin" ] || [ "$OMR_TARGET" = "r2s" ] || [ "$OMR_TARGET" = "rpi3" ] || [ "$OMR_TARGET" = "rk3328-gather" ]; then
 	echo "Checking if BBRv2 patch is set or not"
 	if ! patch -Rf -N -p1 -s --dry-run < ../../patches/bbr2.patch; then
 		echo "apply..."
@@ -406,11 +410,16 @@ if ! patch -Rf -N -p1 -s --dry-run < ../../patches/rtl8821cu.patch; then
 fi
 echo "Done"
 
+if [ "$OMR_TARGET" = "nanopi_neo" ]; then 
 # add nanopi neo core supported
-for i in `ls ../../patches/linux`; do [ ! -e target/linux/sunxi/patches-5.4/$i ] && cp ../../patches/linux/$i target/linux/sunxi/patches-5.4/$i; done
-for i in `ls ../../patches/uboot`; do [ ! -e package/boot/uboot-sunxi/patches/$i ] && cp ../../patches/uboot/$i package/boot/uboot-sunxi/patches/$i; done
+for i in `ls ../../patches/linux-sunxi-5.4`; do [ ! -e target/linux/sunxi/patches-5.4/$i ] && cp ../../patches/linux-sunxi-5.4/$i target/linux/sunxi/patches-5.4/$i; done
+for i in `ls ../../patches/uboot-sunxi`; do [ ! -e package/boot/uboot-sunxi/patches/$i ] && cp ../../patches/uboot-sunxi/$i package/boot/uboot-sunxi/patches/$i; done
 cp ../../patches/boot/uEnv-default.txt package/boot/uboot-sunxi/uEnv-default.txt
 cp ../../patches/boot/uEnv-pangolin.txt package/boot/uboot-sunxi/uEnv-pangolin.txt
+elif [ "$OMR_TARGET" = "rk3328-gather" ]; then
+for i in `ls ../../patches/linux-rockchip-5.4`; do [ ! -e target/linux/rockchip/patches-5.4/$i ] && cp ../../patches/linux-rockchip-5.4/$i target/linux/rockchip/patches-5.4/$i; done
+for i in `ls ../../patches/uboot-rockchip`; do [ ! -e package/boot/uboot-rockchip/patches/$i ] && cp ../../patches/uboot-rockchip/$i package/boot/uboot-rockchip/patches/$i; done
+fi
 
 if [ "$OMR_KERNEL" = "5.4" ]; then
 	echo "Set to kernel 5.4 for rpi arch"

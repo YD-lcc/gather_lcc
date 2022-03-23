@@ -2,7 +2,7 @@ name: openmptcprouter
 on:
   push:
     branches: 
-      - 0.78.0
+      - gather-v2
 
 env:
   REPO_URL: 'https://github.com/WillzenZou/Gather'
@@ -41,7 +41,7 @@ jobs:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        ref: 0.78.0
+        ref: gather-v2
         path: './omr'
         token: ${{ secrets.PRI_TOKEN }}
     - name: Build toolchain

@@ -1,0 +1,205 @@
+diff -Naru a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchip/Makefile
+--- a/arch/arm64/boot/dts/rockchip/Makefile	2022-02-22 00:46:48.784781871 +0800
++++ b/arch/arm64/boot/dts/rockchip/Makefile	2022-03-07 16:32:53.320315190 +0800
+@@ -2,6 +2,7 @@
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-evb.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3328-evb.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3328-nanopi-r2s.dtb
++dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3328-gather-v2.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3328-rock64.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3328-roc-cc.dtb
+ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3368-evb-act8846.dtb
+diff -Naru a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts b/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts
+--- a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts	1970-01-01 08:00:00.000000000 +0800
++++ b/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts	2022-03-23 19:26:40.340001661 +0800
+@@ -0,0 +1,190 @@
++// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
++/*
++ * Copyright (c) 2022 Gather
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/gpio/gpio.h>
++// #include "rk3328.dtsi"
++#include "rk3328-evb.dts"
++
++/ {
++	model = "Gather V2";
++	compatible = "gather,version-2", "rockchip,rk3328";
++
++	aliases {
++		led-boot = &sys_led;
++		led-failsafe = &sys_led;
++		led-running = &sys_led;
++		led-upgrade = &sys_led;
++	};
++
++	chosen {
++		stdout-path = "serial2:1500000n8";
++	};
++
++	keys {
++		compatible = "gpio-keys";
++		pinctrl-0 = <&power_button_pin>;
++		pinctrl-names = "default";
++
++		reset {
++			label = "power";
++			gpios = <&gpio0 RK_PA0 GPIO_ACTIVE_LOW>;
++			linux,code = <KEY_POWER>;
++			debounce-interval = <50>;
++		};
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		pinctrl-0 = <&wifi_led_pin>,  <&sys_led_pin>;
++		pinctrl-names = "default";
++
++		wifi_led: led-0 {
++			gpios = <&gpio0 RK_PD6 GPIO_ACTIVE_HIGH>;
++			label = "gather:leds:wifi";
++		};
++
++		sys_led: led-1 {
++			gpios = <&gpio0 RK_PD3 GPIO_ACTIVE_HIGH>;
++			label = "gather:leds:aggregate";
++		};
++	};
++
++        vcc_boot: vcc-boot {
++                compatible = "regulator-fixed";
++                regulator-name = "vcc_boot";
++                regulator-always-on;
++                regulator-boot-on;
++                gpio = <&gpio0 RK_PA2 GPIO_ACTIVE_HIGH>;
++                pinctrl-names = "default";
++                pinctrl-0 = <&power_boot>;
++                enable-active-high;
++                regulator-min-microvolt = <3300000>;
++                regulator-max-microvolt = <3300000>;
++        };
++
++	vcc_sd: sdmmc-regulator {
++		compatible = "regulator-fixed";
++		gpio = <&gpio2 RK_PA3 GPIO_ACTIVE_LOW>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&sdmmc0m1_gpio>;
++		regulator-name = "vcc_sd";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		vin-supply = <&vcc_io>;
++	};
++};
++
++&cpu0 {
++	cpu-supply = <&vdd_arm>;
++};
++
++&cpu1 {
++	cpu-supply = <&vdd_arm>;
++};
++
++&cpu2 {
++	cpu-supply = <&vdd_arm>;
++};
++
++&cpu3 {
++	cpu-supply = <&vdd_arm>;
++};
++
++&i2c1 {
++	status = "okay";
++};
++
++&io_domains {
++	pmuio-supply = <&vcc_io>;
++	vccio1-supply = <&vcc_io>;
++	vccio2-supply = <&vcc18_emmc>;
++	vccio3-supply = <&vcc_io>;
++	vccio4-supply = <&vcc_18>;
++	vccio5-supply = <&vcc_io>;
++	vccio6-supply = <&vcc_io>;
++	status = "okay";
++};
++
++&pinctrl {
++	button {
++		power_button_pin: power-button-pin {
++			rockchip,pins = <0 RK_PA0 RK_FUNC_GPIO &pcfg_pull_up>;
++		};
++	};
++
++	leds {
++		wifi_led_pin: wifi-led-pin {
++			rockchip,pins = <0 RK_PD6 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++
++		sys_led_pin: sys-led-pin {
++			rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_none>;
++		};
++	};
++
++        booton {
++                power_boot: power-boot {
++                        rockchip,pins = <0 RK_PA2 RK_FUNC_GPIO &pcfg_pull_none>;
++                };
++        };
++
++	sdmmc0-1 {
++		sdmmc0m1_pwren: sdmmc0m1-pwren {
++			rockchip,pins = <2 RK_PA3 3 &pcfg_pull_up_4ma>;
++		};
++
++		sdmmc0m1_gpio: sdmmc0m1-gpio {
++			rockchip,pins = <2 RK_PA3 RK_FUNC_GPIO &pcfg_pull_up_4ma>;
++		};
++	};
++};
++
++&tsadc {
++	rockchip,hw-tshut-mode = <0>;
++	rockchip,hw-tshut-polarity = <0>;
++	status = "okay";
++};
++
++&usb20_otg {
++	status = "okay";
++	dr_mode = "host";
++};
++
++&usbdrd3 {
++	status = "okay";
++};
++
++&usbdrd_dwc3 {
++	dr_mode = "host";
++	status = "okay";
++};
++
++&sdmmc {
++	status = "disabled";
++};
++
++&sdio {
++	status = "disabled";
++};
++
++&saradc {
++	status = "okay";
++	vref-supply = <&vcc_18>;
++};
++
++&gmac2phy {
++  status = "okay";
++};
++
++&gmac2io {
++  status = "disabled";
++};
++
++&spdif {
++  status = "disabled";
++};
