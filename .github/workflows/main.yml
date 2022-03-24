@@ -12,7 +12,7 @@ jobs:
   build:
     strategy:
       matrix:
-        OMR_TARGET: [nanopi_neo]
+        OMR_TARGET: [rk3328-gather]
     runs-on: ubuntu-latest
     continue-on-error: true
 
@@ -53,7 +53,7 @@ jobs:
       run: |
         cd ./omr
         ls -al
-        ls -al nanopi_neo/source/package/kernel || true
+        ls -al ${{ matrix.OMR_TARGET }}/source/package/kernel || true
         pwd
     - name: Build packages
       working-directory: ./omr
@@ -81,15 +81,15 @@ jobs:
         release_name: Release ${{ matrix.OMR_TARGET }} ${{ github.sha }}
         draft: false
         prerelease: false
-    - name: Upload Release Asset config-neo
-      id: upload-release-asset-config-neo
+    - name: Upload Release Asset config-${{ matrix.OMR_TARGET }}
+      id: upload-release-asset-config-${{ matrix.OMR_TARGET }}
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.PRI_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
-        asset_path: ./omr/config-nanopi_neo
-        asset_name: config-nanopi_neo
+        asset_path: ./omr/config-${{ matrix.OMR_TARGET }}
+        asset_name: config-${{ matrix.OMR_TARGET }}
         asset_content_type: application/octet-stream
     - name: Upload Release Asset image
       id: upload-release-asset-image
@@ -109,7 +109,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a>
         asset_path: ./omr/${{ matrix.OMR_TARGET }}/source/.config
-        asset_name: .config-nanopi_neo
+        asset_name: .config-${{ matrix.OMR_TARGET }}
         asset_content_type: application/octet-stream
 
 #    - name: Deliver firmware

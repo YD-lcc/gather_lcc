@@ -1,11 +1,13 @@
 diff --git a/openmptcprouter/files/etc/uci-defaults/1920-omr-network b/openmptcprouter/files/etc/uci-defaults/1920-omr-network
-index ef722926..5675fbb8 100755
+index ef722926..a24d215d 100755
 --- a/openmptcprouter/files/etc/uci-defaults/1920-omr-network
 +++ b/openmptcprouter/files/etc/uci-defaults/1920-omr-network
-@@ -82,6 +82,8 @@ fi
+@@ -81,7 +81,9 @@ fi
+ 
  lanif="eth0"
  if [ "$(grep rockchip /etc/os-release)" != "" ]; then
- 	lanif="eth1"
+-	lanif="eth1"
++	lanif="br-lan"
 +elif [ "$(grep sunxi /etc/os-release)" != "" ]; then
 +	lanif="br-lan"
  elif [ -d /sys/class/net/lan0 -o -n "$(ip link | grep ' lan0')" ] && [ -d /sys/class/net/wan -o -n "$(ip link | grep ' wan@')" -o -n "$(ip link | grep ' wan:')" ]; then
