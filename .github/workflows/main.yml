@@ -1,4 +1,4 @@
-name: openmptcprouter
+name: openmptcprouter-gather-v2
 on:
   push:
     branches: 
