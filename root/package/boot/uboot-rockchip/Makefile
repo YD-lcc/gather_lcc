@@ -21,7 +21,6 @@ define U-Boot/Default
   HIDDEN:=1
 endef
 
-
 # RK3328 boards
 
 define U-Boot/nanopi-r2s-rk3328
@@ -35,6 +34,16 @@ define U-Boot/nanopi-r2s-rk3328
   OF_PLATDATA:=$(1)
 endef
 
+define U-Boot/gather-v2-rk3328
+  BUILD_SUBTARGET:=armv8
+  NAME:=Gather V2
+  BUILD_DEVICES:= \
+    rk3328_gather-v2
+  DEPENDS:=+PACKAGE_u-boot-gather-v2-rk3328:arm-trusted-firmware-rockchip
+  PKG_BUILD_DEPENDS:=arm-trusted-firmware-rockchip
+  ATF:=rk3328_bl31.elf
+  OF_PLATDATA:=$(1)
+endef
 
 # RK3399 boards
 
@@ -72,7 +81,8 @@ UBOOT_TARGETS := \
   nanopi-r4s-rk3399 \
   rock-pi-4-rk3399 \
   rockpro64-rk3399 \
-  nanopi-r2s-rk3328
+  nanopi-r2s-rk3328 \
+  gather-v2-rk3328
 
 UBOOT_CONFIGURE_VARS += USE_PRIVATE_LIBGCC=yes
 
