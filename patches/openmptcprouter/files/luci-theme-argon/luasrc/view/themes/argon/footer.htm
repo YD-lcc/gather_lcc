@@ -23,7 +23,7 @@
 </div>
 <footer class="mobile-hide">
 	<div>
-		<a>ID: <%=sys.exec("cat /proc/cpuinfo | grep Serial | awk '{print $3}'")%>, </a>
+		<a>ID: <%=sys.exec("cat /sys/class/mmc_host/mmc0/mmc0:0001/cid | tr -d '\n'")%>, </a>
 		<a class="luci-link" >GATHER NANO V1.3 firmware support openmtpcprouter</a> /
 						<a href="https://github.com/jerrykuku/luci-theme-argon">ArgonTheme <%# vPKG_VERSION %></a> /
 						<%= ver.distversion %>

@@ -569,6 +569,75 @@ generate_gather_network() {
 	local i=$1
 	local defif=$2
 	local multipath=$3
+	local qmitype=$4
+	if [ $qmitype != "" ]; then
+	        uci -q batch <<-EOF
+                set network.wan${i}='interface'
+                set network.wan${i}.device=${defif}
+                set network.wan${i}.proto=${qmitype}
+                set network.wan${i}_dev='device'
+                set network.wan${i}_dev.name=${defif}
+                set openmptcprouter.wan${i}='interface'
+                set network.wan${i}.auth='none'
+                set network.wan${i}.pdptype='ipv4v6'
+                set network.wan${i}.multipath=${multipath}
+                set openmptcprouter.wan${i}.multipath=${multipath}
+                set openmptcprouter.wan${i}.multipathvpn='0'
+                set openmptcprouter.settings.sfe_enabled='1'
+                set openmptcprouter.settings.sfe_bridge='1'
+                set openmptcprouter.settings.master='dynamic'
+                set openmptcprouter.settings.tracebox='1'
+                set omr-tracker.defaults.server_http_test='1'
+                set openmptcprouter.settings.disableserverping='0'
+                set openmptcprouter.settings.disablegwping='0'
+                set network.wan${i}.defaultroute='0'
+                set network.omrvpn.proto='none'
+                set network.lan.defaultroute='0'
+                set network.lan.peerdns='0'
+                reorder network.wan${i}=$((i+2))
+                set sqm.wan${i}=queue
+                set sqm.wan${i}.interface=${defif}
+                set sqm.wan${i}.qdisc='fq_codel'
+                set sqm.wan${i}.script='simple.qos'
+                set sqm.wan${i}.qdisc_advanced='0'
+                set sqm.wan${i}.linklayer='none'
+                set sqm.wan${i}.enabled='0'
+                set sqm.wan${i}.debug_logging='0'
+                set sqm.wan${i}.verbosity='5'
+                set sqm.wan${i}.download='0'
+                set sqm.wan${i}.upload='0'
+                set sqm.wan${i}.iqdisc_opts='autorate-ingress nat dual-dsthost'
+                set sqm.wan${i}.eqdisc_opts='nat dual-srchost'
+                set sqm.lan=queue
+                set sqm.lan.interface='br-lan'
+                set sqm.lan.qdisc='fq_codel'
+                set sqm.lan.script='simple.qos'
+                set sqm.lan.qdisc_advanced='0'
+                set sqm.wan${i}.linklayer='none'
+                set sqm.wan${i}.enabled='0'
+                set sqm.wan${i}.debug_logging='0'
+                set sqm.wan${i}.verbosity='5'
+                set sqm.wan${i}.download='0'
+                set sqm.wan${i}.upload='0'
+                set sqm.wan${i}.iqdisc_opts='autorate-ingress nat dual-dsthost'
+                set sqm.wan${i}.eqdisc_opts='nat dual-srchost'
+                set sqm.lan=queue
+                set sqm.lan.interface='br-lan'
+                set sqm.lan.qdisc='fq_codel'
+                set sqm.lan.script='simple.qos'
+                set sqm.lan.qdisc_advanced='0'
+                set sqm.lan.linklayer='none'
+                set sqm.lan.enabled='0'
+                set sqm.lan.debug_logging='0'
+                set sqm.lan.verbosity='5'
+                set sqm.lan.download='0'
+                set sqm.lan.upload='0'
+                set sqm.lan.iqdisc_opts='autorate-ingress nat dual-dsthost'
+                set sqm.lan.eqdisc_opts='nat dual-srchost'
+                add_list vnstat.@vnstat[-1].interface=${defif}
+                add_list firewall.@zone[1].network=wan${i}
+        EOF
+	else
 	uci -q batch <<-EOF
 		set network.wan${i}='interface'
 		set network.wan${i}.device=${defif}
@@ -621,6 +690,7 @@ generate_gather_network() {
 		add_list vnstat.@vnstat[-1].interface=${defif}
 		add_list firewall.@zone[1].network=wan${i}
 	EOF
+	fi
 }
 
 json_init
@@ -657,12 +727,20 @@ if [ ! -s /etc/config/network ]; then
 		add_list dhcp.@dnsmasq[0].server='114.114.114.114'
 	EOF
 
-	generate_gather_network 1 eth1 on
-	generate_gather_network 2 gather0 on
-	generate_gather_network 3 gather1 on
-	generate_gather_network 4 gather2 on
-	generate_gather_network 5 gather3 on
-	generate_gather_network 6 gather4 on
+	if cat  ${CFG} | grep -q "gather,version-2"; then
+		generate_gather_network 1 eth1 on
+		generate_gather_network 2 /dev/card1 on qmi
+		generate_gather_network 3 /dev/card2 on qmi
+		generate_gather_network 4 /dev/card3 on qmi
+		generate_gather_network 5 /dev/card4 on qmi
+	else
+		generate_gather_network 1 eth1 on
+                generate_gather_network 2 gather0 on qmi
+                generate_gather_network 3 gather1 on qmi
+                generate_gather_network 4 gather2 on qmi
+                generate_gather_network 5 gather3 on qmi
+                generate_gather_network 6 gather4 on qmi
+	fi
 fi
 
 if [ ! -s /etc/config/system ]; then
