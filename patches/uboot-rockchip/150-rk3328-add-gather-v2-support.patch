@@ -63,7 +63,7 @@ diff -Naru a/arch/arm/dts/rk3328-gather-v2.dts b/arch/arm/dts/rk3328-gather-v2.d
 +	leds {
 +                compatible = "gpio-leds";
 +                pinctrl-names = "default";
-+                pinctrl-0 = <&status-led-pin>;
++                pinctrl-0 = <&status_led_pin>;
 +
 +		status_led {
 +                        label = "red:status";
@@ -239,7 +239,7 @@ diff -Naru a/arch/arm/dts/rk3328-gather-v2.dts b/arch/arm/dts/rk3328-gather-v2.d
 +		};
 +	};
 +
-+	status-led-pin {
++	status_led_pin: status-led-pin {
 +		rockchip,pins = <0 RK_PD3 RK_FUNC_GPIO &pcfg_pull_none>;
 +	};
 +};
