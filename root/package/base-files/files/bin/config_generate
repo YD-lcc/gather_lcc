@@ -570,8 +570,8 @@ generate_gather_network() {
 	local defif=$2
 	local multipath=$3
 	local qmitype=$4
-	if [ $qmitype != "" ]; then
-	        uci -q batch <<-EOF
+	if [ -n $qmitype ]; then
+	uci -q batch <<-EOF
                 set network.wan${i}='interface'
                 set network.wan${i}.device=${defif}
                 set network.wan${i}.proto=${qmitype}
@@ -590,7 +590,6 @@ generate_gather_network() {
                 set omr-tracker.defaults.server_http_test='1'
                 set openmptcprouter.settings.disableserverping='0'
                 set openmptcprouter.settings.disablegwping='0'
-                set network.wan${i}.defaultroute='0'
                 set network.omrvpn.proto='none'
                 set network.lan.defaultroute='0'
                 set network.lan.peerdns='0'
@@ -733,13 +732,14 @@ if [ ! -s /etc/config/network ]; then
 		generate_gather_network 3 /dev/card2 on qmi
 		generate_gather_network 4 /dev/card3 on qmi
 		generate_gather_network 5 /dev/card4 on qmi
+		#generate_gather_network 6 /dev/card5 on qmi
 	else
 		generate_gather_network 1 eth1 on
-                generate_gather_network 2 gather0 on qmi
-                generate_gather_network 3 gather1 on qmi
-                generate_gather_network 4 gather2 on qmi
-                generate_gather_network 5 gather3 on qmi
-                generate_gather_network 6 gather4 on qmi
+                generate_gather_network 2 gather0 on
+                generate_gather_network 3 gather1 on
+                generate_gather_network 4 gather2 on
+                generate_gather_network 5 gather3 on
+                generate_gather_network 6 gather4 on
 	fi
 fi
 

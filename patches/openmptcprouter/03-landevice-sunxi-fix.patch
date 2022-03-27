@@ -1,8 +1,24 @@
 diff --git a/openmptcprouter/files/etc/uci-defaults/1920-omr-network b/openmptcprouter/files/etc/uci-defaults/1920-omr-network
-index ef722926..a24d215d 100755
+index ef722926..74b81f09 100755
 --- a/openmptcprouter/files/etc/uci-defaults/1920-omr-network
 +++ b/openmptcprouter/files/etc/uci-defaults/1920-omr-network
-@@ -81,7 +81,9 @@ fi
+@@ -75,13 +75,25 @@ config_load network
+ #config_foreach _setup_macvlan_update interface
+ config_foreach _setup_mptcp_handover_to_on interface
+ 
++if cat /etc/board.json | grep -q "gather,version-2"; then
++uci -q batch <<-EOF
++        set network.wan2.proto=qmi
++        set network.wan3.proto=qmi
++        set network.wan4.proto=qmi
++        set network.wan5.proto=qmi
++        commit network
++EOF
++fi
++
+ if [ "$(uci -q show network.lan | grep multipath)" != "" ]; then
+ 	exit 0
+ fi
  
  lanif="eth0"
  if [ "$(grep rockchip /etc/os-release)" != "" ]; then
@@ -13,7 +29,16 @@ index ef722926..a24d215d 100755
  elif [ -d /sys/class/net/lan0 -o -n "$(ip link | grep ' lan0')" ] && [ -d /sys/class/net/wan -o -n "$(ip link | grep ' wan@')" -o -n "$(ip link | grep ' wan:')" ]; then
  	lanif="wan"
  elif [ -d /sys/class/net/lan1 -o -n "$(ip link | grep ' lan1')" ] && [ -d /sys/class/net/wan -o -n "$(ip link | grep ' wan@')" -o -n "$(ip link | grep ' wan:')" ]; then
-@@ -257,7 +259,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
+@@ -177,7 +189,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
+ 		_setup_wan_interface wan3 eth1.3 on
+ 		_setup_wan_interface wan4 eth1.4 on
+ 	elif [ "$(grep rockchip /etc/os-release)" != "" ]; then
+-		_setup_wan_interface wan1 eth0 master macvlan
++		_setup_wan_interface wan1 eth0 on macvlan
+ 		_setup_wan_interface wan2 eth0 on macvlan
+ 		_setup_macvlan wan1
+ 		_setup_macvlan wan2
+@@ -257,7 +269,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
  		fi
  	elif [ -d /sys/class/net/eth1 ] || [ -n "$(ip link | grep ' eth1:')" ]; then
  		if [ -d /sys/class/net/eth2 ] || [ -n "$(ip link | grep ' eth2:')" ]; then
@@ -22,7 +47,7 @@ index ef722926..a24d215d 100755
  			_setup_wan_interface wan2 eth2 on
  			if [ -d /sys/class/net/eth3 ] || [ -n "$(ip link | grep ' eth3:')" ]; then
  				_setup_wan_interface wan3 eth3 on
-@@ -278,7 +280,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
+@@ -278,7 +290,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
  				_setup_wan_interface wan8 eth8 on
  			fi
  		else
@@ -31,7 +56,7 @@ index ef722926..a24d215d 100755
  			_setup_wan_interface wan2 eth1 on macvlan
  			_setup_macvlan wan1
  			_setup_macvlan wan2
-@@ -287,7 +289,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
+@@ -287,7 +299,7 @@ if [ "$(uci -q show network.wan1 | grep multipath)" = "" ] && [ -z "$(uci -q get
  		_setup_wan_interface wan1 eth0.1 master
  		_setup_wan_interface wan2 eth0.2 on
  	else
