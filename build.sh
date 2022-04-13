@@ -510,6 +510,7 @@ else
 fi
 scripts/feeds install kmod-macremapper
 scripts/feeds install -p luci luci-app-user
+scripts/feeds install python3-pyserial
 cp .config.keep .config
 echo "Done"
 
