@@ -166,7 +166,7 @@ index f2c85d3e..ac381004 100644
  			<option value="<%='@' .. ifacea:name()%>"><%='@' .. ifacea:name() .. ' (alias)'%></option>
  			<%
 diff --git a/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter b/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
-index f8a0dc21..5bddf94f 100755
+index f8a0dc21..f93f9909 100755
 --- a/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
 +++ b/luci-app-openmptcprouter/root/etc/uci-defaults/openmptcprouter
 @@ -50,12 +50,12 @@ if [ "$(uci -q get openmptcprouter.omr)" != "router" ]; then
@@ -188,7 +188,7 @@ index f8a0dc21..5bddf94f 100755
  if [ "$(uci -q get openmptcprouter.settings.master)" = "redundant" ] || [ "$(uci -q get openmptcprouter.settings.master)" = "" ]; then
  	uci -q batch <<-EOF >/dev/null
  		set openmptcprouter.settings.master='balancing'
-@@ -126,7 +126,57 @@ fi
+@@ -126,7 +126,58 @@ fi
  
  if [ "$(uci -q get openmptcprouter.settings.tracebox)" = "" ]; then
  	uci -q batch <<-EOF >/dev/null
@@ -216,6 +216,7 @@ index f8a0dc21..5bddf94f 100755
 +		set openmptcprouter.vps.port='65500'
 +		delete openmptcprouter.vps.ip
 +		add_list openmptcprouter.vps.ip="${ipaddr}"
++		set openmptcprouter.vps.get_config='1'
 +		set openmptcprouter.settings.proxy='shadowsocks'
 +		set openmptcprouter.settings.ha='0'
 +		set openmptcprouter.settings.vpn='glorytun_tcp'

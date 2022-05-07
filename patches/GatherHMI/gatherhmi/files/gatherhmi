@@ -1,0 +1,17 @@
+#!/bin/sh /etc/rc.common
+# Copyright (C) 2009-2010 OpenWrt.org
+
+START=25
+STOP=15
+workdir=/usr/share/GatherHMI
+
+start() {
+		# 启动 HMI
+		chmod +x ${workdir}/setmptcp.sh
+		cd ${workdir} && python3 ${workdir}/boot_hmi.py > /tmp/boot-hmi.log 2>&1 &
+}
+
+stop() {
+		# 关闭 HMI
+		kill -9 `ps w|grep -E "boot_hmi"|grep -v "grep"|awk '{print $1}'` 2>/dev/null
+}

@@ -26,7 +26,7 @@ _get_repo() (
 	git checkout -f "origin/$3" -B "build" 2>/dev/null || git checkout "$3" -B "build"
 )
 
-ManualVersion=b-v1.0.2
+ManualVersion=gv2-v1.0.3
 
 OMR_DIST=${OMR_DIST:-openmptcprouter}
 OMR_HOST=${OMR_HOST:-$(curl -sS ifconfig.co)}
@@ -149,6 +149,7 @@ src-link packages $(readlink -f feeds/packages)
 src-link luci $(readlink -f feeds/luci)
 src-link openmptcprouter $(readlink -f "$OMR_FEED")
 src-link NanoHatOLED $(readlink -f patches/GatherOLED)
+src-link GatherHMI $(readlink -f patches/GatherHMI)
 EOF
 
 if [ -n "$CUSTOM_FEED" ]; then
@@ -497,6 +498,7 @@ rm -rf feeds/openmptcprouter/serdisplib
 #scripts/feeds install -d y -p packages lcd4linux
 #scripts/feeds install -d y -p packages serdisplib
 scripts/feeds install gatheroled
+scripts/feeds install gatherhmi
 
 if [ "$OMR_ALL_PACKAGES" = "yes" ]; then
 	scripts/feeds install -a -d m -p packages

@@ -11,8 +11,8 @@ diff -Naru a/arch/arm64/boot/dts/rockchip/Makefile b/arch/arm64/boot/dts/rockchi
  dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3368-evb-act8846.dtb
 diff -Naru a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts b/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts
 --- a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts	1970-01-01 08:00:00.000000000 +0800
-+++ b/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts	2022-03-23 19:26:40.340001661 +0800
-@@ -0,0 +1,190 @@
++++ b/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts	2022-04-14 22:55:31.790584290 +0800
+@@ -0,0 +1,195 @@
 +// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 +/*
 + * Copyright (c) 2022 Gather
@@ -168,6 +168,7 @@ diff -Naru a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts b/arch/arm64/boot
 +&usb20_otg {
 +	status = "okay";
 +	dr_mode = "host";
++	phys = <&u2phy_host>;
 +};
 +
 +&usbdrd3 {
@@ -202,4 +203,8 @@ diff -Naru a/arch/arm64/boot/dts/rockchip/rk3328-gather-v2.dts b/arch/arm64/boot
 +
 +&spdif {
 +  status = "disabled";
++};
++
++&uart1 {
++  status = "okay";
 +};
