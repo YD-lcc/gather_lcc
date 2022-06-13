@@ -57,3 +57,4 @@ CONFIG_PACKAGE_hostapd-common=y
 CONFIG_PACKAGE_python3=y
 CONFIG_PACKAGE_python3-pyserial=y
 CONFIG_PACKAGE_gatherhmi=y
+CONFIG_PACKAGE_kmod-iio-core=y
